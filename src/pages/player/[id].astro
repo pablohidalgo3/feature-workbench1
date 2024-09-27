@@ -20,7 +20,7 @@ const { Content } = await render(player)
 ---
 
 <Layout title={`Player - ${nickname}`}>
-    <div class="flex gap-12">
+    <div class="flex gap-12 justify-center">
         <aside class="flex flex-col items-center gap-4">
             <img transition:name={`img-${slug}`} class="rounded w-72 h-auto" src={`/${img}`} alt="{name}" />
         </aside>
@@ -40,4 +40,6 @@ const { Content } = await render(player)
         0 0 10px rgb(214, 211, 30)
         )
     }
+
+    
 </style>

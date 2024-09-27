@@ -20,7 +20,7 @@ const { title } = Astro.props;
 		<ClientRouter />
 	</head>
 	<body>
-		<Header />
+		<Header/>
 		<div>
 			<slot />
 		</div>
@@ -31,5 +31,6 @@ const { title } = Astro.props;
 		font-family: system-ui, sans-serif;
 		background: #171717;
 		color: #fff;
+		scrollbar-width: none;
 	}
 </style>
