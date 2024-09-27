@@ -6,7 +6,7 @@ birthday: November 17, 1999
 age: 24
 team: G2 Esports
 position: Mid
-img: caps.webp
+img: caps.avif
 ---
 
 ## Trivia

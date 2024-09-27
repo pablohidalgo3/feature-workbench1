@@ -1,0 +1,224 @@
+---
+import Logo from "./Logo.astro";
+---
+
+<header
+  id="landing-header"
+  class="py-5 px-10 hidden md:flex items-center top-0 w-full justify-between z-40"
+>
+  <div class="flex flex-grow basis-0">
+    <a
+            href="/"
+            class="transition-all duration-300"
+          >
+    <Logo />
+    </a
+          >
+  </div>
+
+  <nav class="hidden md:flex space-x-4">
+    <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+      <ul
+        class="flex text-sm [&>li>a]:font-medium [&>li>a]:inline-block [&>li>a]:px-4 [&>li>a]:py-2 [&>li>a]:transition-colors [&>li>a]:duration-300"
+      >
+        <li>
+          <a
+            href="/"
+            class="transition-all duration-300"
+            >Home</a
+          >
+        </li>
+        <li id="activeroster">
+          <a
+            href="/activeroster"
+            class="transition-all duration-300"
+            ><span
+              class="text-black font-bold bg-white pl-1.5 pt-1.5 pb-1.5 rounded-l transition-colors"
+              >Active</span
+            ><span
+              class="text-red-600 font-bold bg-white pr-1.5 pt-1.5 pb-1.5 rounded-r transition-colors"
+            >
+              Roster</span
+            ></a
+          >
+        </li>
+        <li><a href={`/year/1`}>Former Rosters</a></li>
+        <li><a href="#">History</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <nav class="flex flex-grow basis-0 justify-end">
+    <ul
+      class="flex text-sm [&>li>a]:font-medium [&>li>a]:inline-block [&>li>a]:px-4 [&>li>a]:py-2 [&>li>a]:transition-colors [&>li>a]:duration-300"
+    >
+      <li><!-- Aquí puede haber algo o no --></li>
+    </ul>
+  </nav>
+</header>
+
+<header
+  id="landing-header-mobile"
+  class="py-5 px-10 flex md:hidden items-center top-0 w-full justify-between z-40"
+>
+  <div class="flex flex-grow basis-0 justify-center">
+    <a
+      href="/"
+      class="transition-all duration-300"
+    >
+      <Logo />
+    </a>
+  </div>
+
+  <div>
+    <button id="menu-button" class="focus:outline-none">
+      <svg
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16m-7 6h7"></path>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<div
+  id="mobile-menu"
+  class="hidden md:hidden shadow-md mt-2"
+>
+  <nav class="flex flex-col space-y-2 p-4">
+    <a href="/" class="text-gray-700 hover:text-gray-900">Home</a>
+    <a href="/activeroster" class="text-gray-700 hover:text-gray-900">Active Roster</a>
+    <a href="/year/1" class="text-gray-700 hover:text-gray-900">Former Rosters</a>
+    <a href="#" class="text-gray-700 hover:text-gray-900">History</a>
+  </nav>
+</div>
+<div
+    id="menu-backdrop"
+    class="absolute bg-black/30 backdrop-blur-lg rounded translate-x-[var(--left)] translate-y-[var(--top)] left-0 top-0 w-[var(--width)] h-[var(--height)] transition-all duration-300 ease-in-out opacity-0 -z-10"
+  >
+  </div>
+
+<script>
+  function initializeMenu() {
+    const menuButton = document.getElementById("menu-button");
+    const menu = document.getElementById("mobile-menu");
+    const content = document.querySelector("main") || document.body;
+
+    if (menuButton && menu) {
+      menuButton.addEventListener("click", function () {
+        content.classList.add("smooth-scroll");
+
+        if (menu.classList.contains("hidden")) {
+          menu.classList.remove("hidden", "animate-slide-out-top");
+          menu.classList.add("animate-slide-in-top");
+          content.style.marginTop = `50px`; // Ajustar margen superior a una distancia menor
+        } else {
+          menu.classList.remove("animate-slide-in-top");
+          menu.classList.add("animate-slide-out-top");
+          setTimeout(() => {
+            menu.classList.add("hidden");
+            content.style.marginTop = ""; // Eliminar margen superior
+          }, 100); // Duración de la animación en ms
+        }
+      });
+
+      document.addEventListener("click", function (event) {
+        if (!menu.contains(event.target as Node) && !menuButton.contains(event.target as Node)) {
+          if (!menu.classList.contains("hidden")) {
+            menu.classList.remove("animate-slide-in-top");
+            menu.classList.add("animate-slide-out-top");
+            setTimeout(() => {
+              menu.classList.add("hidden");
+              content.style.marginTop = ""; // Eliminar margen superior
+            }, 100); // Duración de la animación en ms
+          }
+        }
+      });
+    }
+  }
+
+  function setupMenuBackdrop() {
+    const listItem = document.querySelectorAll("#landing-header li");
+    const menuBackdrop = document.querySelector("#menu-backdrop") as HTMLElement | null;
+
+    if (menuBackdrop) {
+      listItem.forEach((item) => {
+        item.addEventListener("mouseenter", () => {
+          const { left, top, width, height } = item.getBoundingClientRect();
+
+          menuBackdrop.style.setProperty("--left", `${left}px`);
+          menuBackdrop.style.setProperty("--top", `${top}px`);
+          menuBackdrop.style.setProperty("--width", `${width}px`);
+          menuBackdrop.style.setProperty("--height", `${height}px`);
+          menuBackdrop.style.opacity = "1";
+          menuBackdrop.style.visibility = "visible";
+        });
+
+        item.addEventListener("mouseleave", () => {
+          menuBackdrop.style.opacity = "0";
+          menuBackdrop.style.visibility = "hidden";
+        });
+      });
+    }
+  }
+
+  function setupHeaderObserver() {
+    const header = document.querySelector("#landing-header") as HTMLElement | null;
+    if (header) {
+      const observerOptions = {
+        root: null,
+        rootMargin: "0px",
+        threshold: 0.9,
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          const { isIntersecting } = entry;
+          if (isIntersecting) {
+            const color = entry.target.getAttribute("data-header-color");
+            header.style.color = color || "black";
+          }
+        });
+      }, observerOptions);
+
+      const sections = document.querySelectorAll(".landing-section");
+      sections.forEach((section) => observer.observe(section));
+    }
+  }
+
+  function setupActiveRosterHover() {
+    const liElement = document.getElementById("activeroster");
+    if (liElement) {
+      const spans = liElement.querySelectorAll("span");
+
+      liElement.addEventListener("mouseenter", function () {
+        spans.forEach(function (span) {
+          span.style.backgroundColor = "transparent";
+        });
+      });
+
+      liElement.addEventListener("mouseleave", function () {
+        spans.forEach(function (span) {
+          span.style.backgroundColor = "";
+        });
+      });
+    }
+  }
+
+  function initializeScripts() {
+    initializeMenu();
+    setupMenuBackdrop();
+    setupHeaderObserver();
+    setupActiveRosterHover();
+  }
+
+  document.addEventListener("astro:page-load", initializeScripts);
+</script>
