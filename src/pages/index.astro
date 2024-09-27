@@ -2,7 +2,23 @@
 import Layout from '../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
+// Definir el orden de las posiciones
+const positionOrder: Record<string, number> = {
+  'Top': 1,
+  'Jungler': 2,
+  'Mid': 3,
+  'Adc': 4,
+  'Support': 5
+};
+
 const players = await getCollection('players');
+
+// Filtrar y ordenar los jugadores
+players.sort((a, b) => {
+  const positionA = positionOrder[a.data.position as keyof typeof positionOrder] || 999;
+  const positionB = positionOrder[b.data.position as keyof typeof positionOrder] || 999;
+  return positionA - positionB;
+});
 
 ---
 

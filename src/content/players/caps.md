@@ -1,11 +1,12 @@
 ---
 nickname: Caps
-name: Rasmus Borregaard Winther
+name: Rasmus Winther
 country: Denmark
 birthday: November 17, 1999
 age: 24
 team: G2 Esports
 position: Mid
+years: 2019, 2020, 2021, 2022, 2023, 2024
 img: caps.avif
 ---
 

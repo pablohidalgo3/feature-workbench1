@@ -9,6 +9,7 @@ const players = defineCollection({
         age: z.number(),
         team: z.string(),
         position: z.string(),
+        years: z.string(),
         img: z.string(),
     })
 })
