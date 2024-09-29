@@ -48,20 +48,31 @@ filteredPlayers.sort((a, b) => {
 		<h1 class="text-3xl font-bold text-center mb-10">{selectedYear} roster</h1>
 
 		<!-- Selector de año para móviles (visible solo en pantallas pequeñas) -->
-		<div class="sm:hidden mb-6 flex justify-center">
-			<label for="year-selector" class="sr-only">Seleccionar año</label>
-			<select 
-			  id="year-selector" 
-			  class="block w-24 h-8 bg-gray-800 text-white text-center border-gray-500 rounded-full" 
-			  onchange="window.location.href = `/year/${this.value}`;"
+<div class="sm:hidden mb-6 flex justify-center">
+	<!-- Caja que imita el estilo de un <select> -->
+	<div class="relative inline-block w-24 h-8 bg-gray-800 text-white text-center border-gray-500 rounded-full">
+	  <button class="w-full h-full flex items-center justify-center focus:outline-none" id="dropdown-button">
+		{selectedYear} <!-- Mostrar el año seleccionado -->
+		<svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+		</svg>
+	  </button>
+	  
+	  <!-- Lista desplegable que contiene los años como enlaces -->
+	  <ul id="dropdown-menu" class="absolute left-0 mt-1 w-full bg-gray-800 text-white rounded-lg hidden z-10 shadow-lg">
+		{years.map(year => (
+		  <li>
+			<a 
+			  href={`/year/${year}`} 
+			  class={`block px-4 py-1 hover:bg-gray-700 text-center rounded-lg ${year === selectedYear ? 'bg-yellow-500' : ''}`}
 			>
-			  {years.map(year => (
-				<option value={year} selected={year === selectedYear}>
-				  {year}
-				</option>
-			  ))}
-			</select>
-		  </div>
+			  {year}
+			</a>
+		  </li>
+		))}
+	  </ul>
+	</div>
+  </div>
 
 		<!-- Para pantallas móviles (sm:hidden) -->
 		<div class="px-4 sm:hidden mx-auto max-w-screen-xl">
@@ -181,3 +192,25 @@ filteredPlayers.sort((a, b) => {
 	  </section>
 	</main>
 </Layout>
+
+<script>
+	document.addEventListener('astro:page-load', function() {
+	  const dropdownButton = document.getElementById('dropdown-button');
+	  const dropdownMenu = document.getElementById('dropdown-menu');
+	  
+	  // Verificar si los elementos existen antes de interactuar con ellos
+	  if (dropdownButton && dropdownMenu) {
+		dropdownButton.addEventListener('click', function() {
+		  // Alternar la visibilidad del menú desplegable
+		  dropdownMenu.classList.toggle('hidden');
+		});
+  
+		// Cerrar el menú si se hace clic fuera de él
+		document.addEventListener('click', function(event) {
+		  if (!dropdownButton.contains(event.target as Node) && !dropdownMenu.contains(event.target as Node)) {
+			dropdownMenu.classList.add('hidden');
+		  }
+		});
+	  }
+	});
+  </script>
