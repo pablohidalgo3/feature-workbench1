@@ -1,0 +1,157 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+const positionOrder: Record<string, number> = {
+  'Top': 1,
+  'Jungler': 2,
+  'Mid': 3,
+  'Adc': 4,
+  'Support': 5
+};
+
+// Obtener todos los jugadores de la colección 'players'
+const players = await getCollection('players');
+
+// Obtener el parámetro del año seleccionado de la URL
+const { id } = Astro.params;
+
+// Filtrar los jugadores que pertenecen al año seleccionado
+const filteredPlayers = players.filter(player => player.data.years.includes(id ? parseInt(id).toString() : ''));
+
+// Si no hay año seleccionado, redirigir a 2016
+const selectedYear = id ? parseInt(id) : 2016;
+
+// Exportar la función getStaticPaths para generar las rutas dinámicas
+export async function getStaticPaths() {
+  // Definir los años para los que deseas generar las rutas (2016-2024)
+  const years = Array.from({ length: 2024 - 2016 + 1 }, (_, i) => 2016 + i);
+
+  // Retornar las rutas dinámicas
+  return years.map(year => ({
+    params: { id: year.toString() },
+  }));
+}
+
+// Filtrar y ordenar los jugadores
+filteredPlayers.sort((a, b) => {
+  const positionA = positionOrder[a.data.position as keyof typeof positionOrder] || 999;
+  const positionB = positionOrder[b.data.position as keyof typeof positionOrder] || 999;
+  return positionA - positionB;
+});
+---
+
+<Layout title="G2 Esports Playerbase">
+	<main class="flex flex-col items-center">
+	  <section aria-label="Jugadores de G2 Esports">
+		<h1 class="text-3xl font-bold text-center mb-10">{selectedYear} roster</h1>
+		<!-- Para pantallas móviles (sm:hidden) -->
+		<div class="px-4 sm:hidden mx-auto max-w-screen-xl">
+		  <div class="grid gap-6 md:grid-cols-3">
+			{
+			  filteredPlayers.map(player => {
+				const { slug, data } = player;
+				const { nickname, name, position, img } = data;
+  
+				return (
+				  <article class="flex">
+					<a href={`/player/${slug}`} class="mb-2 xl:mb-0 transition hover:scale-110">
+					  <img
+						transition:name={`img-${slug}`}
+						class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
+						src={`/${img}`}
+						alt={name}
+					  />
+					</a>
+  
+					<div class="flex flex-col justify-center">
+					  <h1 transition:name={`nickname-${slug}`} class="mb-2 text-4xl font-bold leading-tight text-white">
+						{nickname}
+					  </h1>
+					  <h2 transition:name={`name-${slug}`} class="mb-2 text-2xl font-bold leading-tight text-white">
+						{name}
+					  </h2>
+  
+					  <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
+					</div>
+				  </article>
+				);
+			  })
+			}
+		  </div>
+		</div>
+  
+		<!-- Para pantallas mayores que móviles (sm:block y superiores) -->
+		<div class="px-4 hidden sm:block mx-auto max-w-screen-xl">
+		  <!-- Primera fila con 3 jugadores -->
+		  <div class="grid gap-6 grid-cols-3">
+			{
+			  filteredPlayers.slice(0, 3).map(player => {
+				const { slug, data } = player;
+				const { nickname, name, position, img } = data;
+  
+				return (
+				  <article class="flex">
+					<a href={`/player/${slug}`} class="mb-2 xl:mb-0 transition hover:scale-110">
+					  <img
+						transition:name={`img-${slug}`}
+						class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
+						src={`/${img}`}
+						alt={name}
+					  />
+					</a>
+  
+					<div class="flex flex-col justify-center">
+					  <h1 transition:name={`nickname-${slug}`} class="mb-2 text-4xl font-bold leading-tight text-white">
+						{nickname}
+					  </h1>
+					  <h2 transition:name={`name-${slug}`} class="mb-2 text-2xl font-bold leading-tight text-white">
+						{name}
+					  </h2>
+  
+					  <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
+					</div>
+				  </article>
+				);
+			  })
+			}
+		  </div>
+  
+		  <!-- Segunda fila con 2 jugadores -->
+		  <div class="flex gap-6 mt-8 justify-center">
+			{
+			  filteredPlayers.slice(3, 5).map(player => {
+				const { slug, data } = player;
+				const { nickname, name, position, img } = data;
+  
+				return (
+				  <article class="flex">
+					<a href={`/player/${slug}`} class="mb-2 xl:mb-0 transition hover:scale-110">
+					  <img
+						transition:name={`img-${slug}`}
+						class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
+						src={`/${img}`}
+						alt={name}
+					  />
+					</a>
+  
+					<div class="flex flex-col justify-center">
+					  <h1 transition:name={`nickname-${slug}`} class="mb-2 text-4xl font-bold leading-tight text-white">
+						{nickname}
+					  </h1>
+					  <h2 transition:name={`name-${slug}`} class="mb-2 text-2xl font-bold leading-tight text-white">
+						{name}
+					  </h2>
+  
+					  <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
+					</div>
+				  </article>
+				);
+			  })
+			}
+		  </div>
+		</div>
+  
+	  </section>
+	</main>
+  </Layout>
