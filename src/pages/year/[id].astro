@@ -197,21 +197,19 @@ filteredPlayers.sort((a, b) => {
 	function initializeDropdown() {
 	  const dropdownButton = document.getElementById('dropdown-button');
 	  const dropdownMenu = document.getElementById('dropdown-menu');
-	  
+
 	  // Verificar si los elementos existen antes de agregar eventos
 	  if (dropdownButton !== null && dropdownMenu !== null) {
-		// Remover eventos previos si ya existen
-		dropdownButton.removeEventListener('click', toggleDropdown);
-		document.removeEventListener('click', closeDropdown);
-		
+		// Limpiar cualquier evento existente
+		cleanupDropdownEvents(dropdownButton);
+
 		// Definir las funciones de evento solo si los elementos son no nulos
 		function toggleDropdown() {
-		  if (dropdownMenu !== null) { // Verificación dentro de la función
+		  if (dropdownMenu !== null) {
 			dropdownMenu.classList.toggle('hidden');
 		  }
 		}
-		
-		// Definir el tipo explícito de 'event' como 'MouseEvent'
+
 		function closeDropdown(event: MouseEvent) {
 		  if (dropdownButton !== null && dropdownMenu !== null) {
 			if (!dropdownButton.contains(event.target as Node) && !dropdownMenu.contains(event.target as Node)) {
@@ -219,11 +217,25 @@ filteredPlayers.sort((a, b) => {
 			}
 		  }
 		}
-		
+
 		// Añadir eventos
 		dropdownButton.addEventListener('click', toggleDropdown);
 		document.addEventListener('click', closeDropdown);
+
+		// Guardar las funciones en el elemento para poder limpiarlas más tarde
+		(dropdownButton as any)._toggleDropdown = toggleDropdown;
+		(dropdownButton as any)._closeDropdown = closeDropdown;
 	  }
 	}
+
+	// Función para eliminar los eventos de un dropdown específico
+	function cleanupDropdownEvents(dropdownButton: HTMLElement) {
+	  if ((dropdownButton as any)._toggleDropdown) {
+		dropdownButton.removeEventListener('click', (dropdownButton as any)._toggleDropdown);
+		document.removeEventListener('click', (dropdownButton as any)._closeDropdown);
+	  }
+	}
+
+	// Inicialización cuando la página se carga
 	document.addEventListener("astro:page-load", initializeDropdown);
 </script>
