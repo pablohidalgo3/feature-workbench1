@@ -7,22 +7,40 @@ import Logo from "./Logo.astro";
   class="py-5 px-10 hidden md:flex items-center top-0 w-full justify-between z-40 mb-16"
 >
   <div class="flex flex-grow basis-0">
-    <a href="/" class="transition-all duration-300">
-      <Logo />
-    </a>
+    <a
+            href="/"
+            class="transition-all duration-300"
+          >
+    <Logo />
+    </a
+          >
   </div>
 
   <nav class="hidden md:flex space-x-4">
     <div class="hidden w-full md:block md:w-auto" id="navbar-default">
-      <ul class="flex text-sm [&>li>a]:font-medium [&>li>a]:inline-block [&>li>a]:px-4 [&>li>a]:py-2 [&>li>a]:transition-colors [&>li>a]:duration-300">
+      <ul
+        class="flex text-sm [&>li>a]:font-medium [&>li>a]:inline-block [&>li>a]:px-4 [&>li>a]:py-2 [&>li>a]:transition-colors [&>li>a]:duration-300"
+      >
         <li>
-          <a href="/" class="transition-all duration-300">Home</a>
+          <a
+            href="/"
+            class="transition-all duration-300"
+            >Home</a
+          >
         </li>
         <li id="activeroster">
-          <a href="/activeroster" class="transition-all duration-300">
-            <span class="text-white font-bold pl-1.5 pt-1.5 pb-1.5 rounded-l transition-colors">Active</span>
-            <span class="text-red-600 font-bold pr-1.5 pt-1.5 pb-1.5 rounded-r transition-colors">Roster</span>
-          </a>
+          <a
+            href="/activeroster"
+            class="transition-all duration-300"
+            ><span
+              class="text-white font-bold pl-1.5 pt-1.5 pb-1.5 rounded-l transition-colors"
+              >Active</span
+            ><span
+              class="text-red-600 font-bold pr-1.5 pt-1.5 pb-1.5 rounded-r transition-colors"
+            >
+              Roster</span
+            ></a
+          >
         </li>
         <li><a href={`/year/2024`}>Former Rosters</a></li>
         <li><a href="#">History</a></li>
@@ -31,7 +49,9 @@ import Logo from "./Logo.astro";
   </nav>
 
   <nav class="flex flex-grow basis-0 justify-end">
-    <ul class="flex text-sm [&>li>a]:font-medium [&>li>a]:inline-block [&>li>a]:px-4 [&>li>a]:py-2 [&>li>a]:transition-colors [&>li>a]:duration-300">
+    <ul
+      class="flex text-sm [&>li>a]:font-medium [&>li>a]:inline-block [&>li>a]:px-4 [&>li>a]:py-2 [&>li>a]:transition-colors [&>li>a]:duration-300"
+    >
       <li><!-- Aquí puede haber algo o no --></li>
     </ul>
   </nav>
@@ -50,7 +70,7 @@ import Logo from "./Logo.astro";
   </div>
 
   <!-- Menú horizontal siempre visible -->
-  <nav class="bg-gray-900 text-white rounded-full px-4 py-2 w-full flex justify-around shadow-lg mt-2">
+  <nav class="bg-gray-900 text-white rounded-full px-4 py-2 w-full flex justify-around shadow-lg">
     <a href="/" class="text-sm hover:text-gray-300 transition-all">Home</a>
     <a href="/activeroster" class="text-sm hover:text-gray-300 transition-all">Active Roster</a>
     <a href="/year/2024" class="text-sm hover:text-gray-300 transition-all">Former Rosters</a>
@@ -58,6 +78,22 @@ import Logo from "./Logo.astro";
   </nav>
 </header>
 
+<div
+  id="mobile-menu"
+  class="hidden md:hidden shadow-md mt-2"
+>
+  <nav class="flex flex-col space-y-2 p-4">
+    <a href="/" class="text- hover:text-gray-900">Home</a>
+    <a href="/activeroster" class="text-gray-700 hover:text-gray-900">Active Roster</a>
+    <a href="/year/2024" class="text-gray-700 hover:text-gray-900">Former Rosters</a>
+    <a href="#" class="text-gray-700 hover:text-gray-900">History</a>
+  </nav>
+</div>
+<div
+    id="menu-backdrop"
+    class="absolute bg-white/20 backdrop-blur-lg rounded translate-x-[var(--left)] translate-y-[var(--top)] left-0 top-0 w-[var(--width)] h-[var(--height)] transition-all duration-300 ease-in-out opacity-0 -z-10"
+  >
+  </div>
 
 <script>
   function setupMenuBackdrop() {
