@@ -194,7 +194,7 @@ filteredPlayers.sort((a, b) => {
 </Layout>
 
 <script>
-	document.addEventListener('astro:page-load', function() {
+	function initializeDropdown() {
 	  const dropdownButton = document.getElementById('dropdown-button');
 	  const dropdownMenu = document.getElementById('dropdown-menu');
 	  
@@ -224,8 +224,6 @@ filteredPlayers.sort((a, b) => {
 		dropdownButton.addEventListener('click', toggleDropdown);
 		document.addEventListener('click', closeDropdown);
 	  }
-	});
+	}
+	document.addEventListener("astro:page-load", initializeDropdown);
 </script>
-
-
-
