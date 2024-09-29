@@ -13,7 +13,7 @@ const positionOrder: Record<string, number> = {
 
 const players = await getCollection('players');
 
-const filteredPlayers = players.filter(player => player.data.years.includes("2024" ? parseInt("2024").toString() : ''));
+const filteredPlayers = players.filter(player => player.data.years.includes("2024"));
 
 // Filtrar y ordenar los jugadores
 filteredPlayers.sort((a, b) => {
