@@ -48,4 +48,3 @@ Reached 1000 kills in the LEC on June 12, 2020.
 x1 MSI (2019)
 x14 LEC (Spring 2018, Summer 2018, Spring 2019, Summer 2019, Spring 2020, Summer 2020, Spring 2022, Winter 2023, Summer 2023, Season Finals 2023, Winter 2024, Spring 2024, Summer 2024, Season Finals 2024)
 x2 Rift Rivals (2018, 2019)
-x1 TCL (Summer 2016)

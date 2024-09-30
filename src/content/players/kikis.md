@@ -6,7 +6,7 @@ birthday: March 16, 1996
 age: 28
 team: G2 Esports
 position: Top
-years: 2016,
+years: 2016.1, 2016.2
 img: kikis.avif
 ---
 

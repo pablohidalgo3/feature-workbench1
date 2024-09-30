@@ -23,4 +23,3 @@ img: brokenblade.avif
 ## Titles
 
 x8 LEC (Spring 2022, Winter 2023, Summer 2023, Season Finals 2023, Winter 2024, Spring 2024, Summer 2024, Season Finals 2024)
-x1 LCS (Summer 2020)

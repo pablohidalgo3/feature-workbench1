@@ -17,20 +17,38 @@ const players = await getCollection('players');
 const { id } = Astro.params;
 
 // Filtrar los jugadores que pertenecen al año seleccionado
-const filteredPlayers = players.filter(player => player.data.years.includes(id ? parseInt(id).toString() : ''));
+const filteredPlayers = players.filter(player => player.data.years.includes(id ? id : ''));
 
-// Si no hay año seleccionado, redirigir a 2016
-const selectedYear = id ? parseInt(id) : 2016;
+// Si no hay año seleccionado, redirigir a 2016.1
+const selectedYear = id ? id : '2016.1';
 
-// Lista de años desde 2016 hasta 2024
-const years = Array.from({ length: 2024 - 2016 + 1 }, (_, i) => 2016 + i);
+// Lista de años desde 2016 (dividido en 3) hasta 2024
+const years = [
+  '2016.1', '2016.2', '2016.3', 
+  ...Array.from({ length: 2024 - 2017 + 1 }, (_, i) => (2017 + i).toString())
+];
+
+// Mapeo de años visuales para los años divididos de 2016
+const yearLabels: Record<string, string> = {
+  '2016.1': '2016 Spring',
+  '2016.2': '2016 Summer Regular',
+  '2016.3': '2016 Summer Playoffs'
+};
+
+// Función para mostrar el año de forma personalizada
+function getYearLabel(year: string) {
+  return yearLabels[year] || year;
+}
 
 // Exportar la función getStaticPaths para generar las rutas dinámicas
 export async function getStaticPaths() {
-  const years = Array.from({ length: 2024 - 2016 + 1 }, (_, i) => 2016 + i);
+  const years = [
+    '2016.1', '2016.2', '2016.3',
+    ...Array.from({ length: 2024 - 2017 + 1 }, (_, i) => (2017 + i).toString())
+  ];
 
   return years.map(year => ({
-    params: { id: year.toString() },
+    params: { id: year },
   }));
 }
 
@@ -45,34 +63,34 @@ filteredPlayers.sort((a, b) => {
 <Layout title="G2 Esports Playerbase">
 	<main class="flex flex-col items-center">
 	  <section aria-label="Jugadores de G2 Esports">
-		<h1 class="text-3xl font-bold text-center mb-10">{selectedYear} roster</h1>
+		<h1 class="text-3xl font-bold text-center mb-10">{getYearLabel(selectedYear)} roster</h1>
 
 		<!-- Selector de año para móviles (visible solo en pantallas pequeñas) -->
-<div class="sm:hidden mb-6 flex justify-center">
-	<!-- Caja que imita el estilo de un <select> -->
-	<div class="relative inline-block w-24 h-8 bg-gray-800 text-white text-center border-gray-500 rounded-full">
-	  <button class="w-full h-full flex items-center justify-center focus:outline-none" id="dropdown-button">
-		{selectedYear} <!-- Mostrar el año seleccionado -->
-		<svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-		  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-		</svg>
-	  </button>
-	  
-	  <!-- Lista desplegable que contiene los años como enlaces -->
-	  <ul id="dropdown-menu" class="absolute left-0 mt-1 w-full bg-gray-800 text-white rounded-lg hidden z-10 shadow-lg">
-		{years.map(year => (
-		  <li>
-			<a 
-			  href={`/year/${year}`} 
-			  class={`block px-4 py-1 hover:bg-gray-700 text-center rounded-lg ${year === selectedYear ? 'bg-yellow-500' : ''}`}
-			>
-			  {year}
-			</a>
-		  </li>
-		))}
-	  </ul>
-	</div>
-  </div>
+		<div class="sm:hidden mb-6 flex justify-center">
+			<!-- Caja que imita el estilo de un <select> -->
+			<div class="relative inline-block w-24 h-8 bg-gray-800 text-white text-center border-gray-500 rounded-full">
+			  <button class="w-full h-full flex items-center justify-center focus:outline-none" id="dropdown-button">
+				{getYearLabel(selectedYear)} <!-- Mostrar el año seleccionado -->
+				<svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+				  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+				</svg>
+			  </button>
+			  
+			  <!-- Lista desplegable que contiene los años como enlaces -->
+			  <ul id="dropdown-menu" class="absolute left-0 mt-1 w-full bg-gray-800 text-white rounded-lg hidden z-10 shadow-lg">
+				{years.map(year => (
+				  <li>
+					<a 
+					  href={`/year/${year}`} 
+					  class={`block px-4 py-1 hover:bg-gray-700 text-center rounded-lg ${year === selectedYear ? 'bg-yellow-500' : ''}`}
+					>
+					  {getYearLabel(year)}
+					</a>
+				  </li>
+				))}
+			  </ul>
+			</div>
+		  </div>
 
 		<!-- Para pantallas móviles (sm:hidden) -->
 		<div class="px-4 sm:hidden mx-auto max-w-screen-xl">
@@ -184,7 +202,7 @@ filteredPlayers.sort((a, b) => {
 			{years.map(year => (
 			  <a href={`/year/${year}`} 
 				 class={`px-4 py-2 border ${year === selectedYear ? 'border-yellow-500 text-yellow-500' : 'border-gray-300 text-gray-500'} rounded hover:text-white`}>
-				{year}
+				{getYearLabel(year)}
 			  </a>
 			))}
 		  </div>

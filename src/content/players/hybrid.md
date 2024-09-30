@@ -6,7 +6,7 @@ birthday: August 5, 1994
 age: 30
 team: G2 Esports
 position: Support
-years: 2016,
+years: 2016.1,
 img: hybrid.avif
 ---
 

@@ -6,7 +6,7 @@ birthday: September 30, 1998
 age: 25
 team: G2 Esports
 position: Mid
-years: 2016, 2017, 2018, 2019, 2020
+years: 2016.1, 2016.2, 2016.3, 2017, 2018, 2019, 2020
 img: perkz.avif
 ---
 

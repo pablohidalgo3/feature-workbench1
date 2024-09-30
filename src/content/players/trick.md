@@ -6,7 +6,7 @@ birthday: July 11, 1995
 age: 29
 team: G2 Esports
 position: Jungler
-years: 2016, 2017
+years: 2016.1, 2016.2, 2016.3, 2017
 img: trick.avif
 ---
 

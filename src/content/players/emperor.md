@@ -6,7 +6,7 @@ birthday: June 7, 1993
 age: 31
 team: G2 Esports
 position: Adc
-years: 2016,
+years: 2016.1,
 img: emperor.avif
 ---
 
