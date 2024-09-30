@@ -2,7 +2,6 @@
 import { getCollection, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 
-
 export async function getStaticPaths() {
     const players = await getCollection("players");
 
@@ -12,35 +11,85 @@ export async function getStaticPaths() {
     }));
 }
 
-const { player } = Astro.props
-const { data, slug } = player
-const { nickname, name, country, birthday, age, team, position, img } = data
+const { player } = Astro.props;
+const { data, slug } = player;
+const { nickname, name, country, birthday, age, team, position, img } = data;
 
-const { Content } = await render(player)
+const { Content } = await render(player);
 ---
 
-<Layout title={`Player - ${nickname}`}>
-    <div class="flex gap-12 justify-center">
-        <aside class="flex flex-col items-center gap-4">
-            <img transition:name={`img-${slug}`} class="rounded w-72 h-auto" src={`/${img}`} alt="{name}" />
-        </aside>
-        <main class="max-w-3xl">
-            <h1 transition:name={`nickname-${slug}`} class="text-4xl font-bold mb-4">{nickname}</h1>
-            <h1 transition:name={`name-${slug}`} class="text-2xl font-bold mb-4">{name}</h1>
-            <h1 class="text-2xl font-bold mb-4">{position}</h1>
-            <div class="prose prose-invert">
-                <Content />
-            </div>
-        </main>
-    </div>
-</Layout>
+<script>
+  function initializeArrowIndicator() {
+    const contentSection = document.querySelector('#content-section') as HTMLElement | null;
+    const arrowIndicator = document.querySelector('#arrow-indicator') as HTMLElement | null;
 
-<style>
-    img {
-        filter: drop-shadow(
-        0 0 10px rgb(214, 211, 30)
-        )
+    // Asegurar que ambos elementos existen antes de continuar
+    if (!contentSection || !arrowIndicator) return;
+
+    // Configuración del IntersectionObserver
+    const observerOptions = {
+      root: null,
+      threshold: 0.1, // Detectar cuando el contenido está algo visible
+    };
+
+    function handleArrowVisibility(entries: IntersectionObserverEntry[]) {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // Ocultar flecha si el contenido es visible
+          if (arrowIndicator) {
+            arrowIndicator.style.display = 'none';
+          }
+        } else {
+          // Mostrar flecha si el contenido no es visible
+          if (arrowIndicator) {
+            arrowIndicator.style.display = 'flex';
+          }
+        }
+      });
     }
 
-    
+    // Crear el observador y observar la sección de contenido
+    const observer = new IntersectionObserver(handleArrowVisibility, observerOptions);
+    observer.observe(contentSection);
+  }
+
+  // Usar `astro:page-load` para que se inicialice cada vez que navegues entre páginas
+  document.addEventListener('astro:page-load', initializeArrowIndicator);
+</script>
+
+<style>
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
 </style>
+
+<Layout title={`Player - ${nickname}`}>
+  <div class="flex flex-col md:flex-row gap-12 justify-center items-center md:items-start">
+    <!-- La imagen se coloca encima en pantallas móviles y a la izquierda en pantallas más grandes -->
+    <aside class="flex flex-col items-center gap-4 md:items-start">
+      <img transition:name={`img-${slug}`} class="rounded w-48 h-auto md:w-72" src={`/${img}`} alt="{name}" />
+    </aside>
+
+    <!-- Contenido -->
+    <main class="text-center md:text-left max-w-3xl mt-6 md:mt-0">
+      <h1 transition:name={`nickname-${slug}`} class="text-3xl md:text-4xl font-bold mb-4">{nickname}</h1>
+      <h1 transition:name={`name-${slug}`} class="text-xl md:text-2xl font-bold mb-4">{name}</h1>
+      <h1 class="text-xl md:text-2xl font-bold mb-8">{position}</h1>
+
+      <!-- `prose` y `prose-invert` solo se aplican en pantallas md y superiores -->
+      <div id="content-section" class="space-y-4 md:prose md:prose-invert">
+        <Content />
+      </div>
+    </main>
+  </div>
+
+  <!-- Flecha indicativa en pantallas móviles -->
+  <div id="arrow-indicator" class="md:hidden fixed bottom-4 right-4 w-12 h-12 flex items-center justify-center bg-black/40 text-white rounded-full animate-bounce text-3xl font-bold" style="animation-duration: 2s;">
+    ↓
+  </div>
+</Layout>
