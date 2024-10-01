@@ -20,52 +20,39 @@ const { Content } = await render(player);
 
 <script>
   function initializeArrowIndicator() {
-    const contentSection = document.querySelector('#content-section') as HTMLElement | null;
-    const arrowIndicator = document.querySelector('#arrow-indicator') as HTMLElement | null;
+    const contentSection = document.querySelector('#content-section');
+    const arrowIndicator = document.querySelector('#arrow-indicator');
 
-    // Asegurar que ambos elementos existen antes de continuar
     if (!contentSection || !arrowIndicator) return;
 
-    // Configuración del IntersectionObserver
     const observerOptions = {
       root: null,
-      threshold: 0.1, // Detectar cuando el contenido está algo visible
+      threshold: 0.1, 
     };
 
-    function handleArrowVisibility(entries: IntersectionObserverEntry[]) {
-      entries.forEach((entry) => {
+    function handleArrowVisibility(entries: any[]) {
+      entries.forEach((entry: { isIntersecting: any; }) => {
         if (entry.isIntersecting) {
-          // Ocultar flecha si el contenido es visible
           if (arrowIndicator) {
-            arrowIndicator.style.display = 'none';
+            (arrowIndicator as HTMLElement).style.display = 'none';
           }
         } else {
-          // Mostrar flecha si el contenido no es visible
           if (arrowIndicator) {
-            arrowIndicator.style.display = 'flex';
+            (arrowIndicator as HTMLElement).style.display = 'flex';
           }
         }
       });
     }
 
-    // Crear el observador y observar la sección de contenido
     const observer = new IntersectionObserver(handleArrowVisibility, observerOptions);
     observer.observe(contentSection);
   }
 
-  // Esperar a que la UI esté completamente lista para inicializar la flecha
-  function waitForUIReady() {
-    if (document.readyState === 'complete') {
-      initializeArrowIndicator();
-    } else {
-      requestAnimationFrame(waitForUIReady);
-    }
-  }
-
-  // Usar `DOMContentLoaded` para la primera carga y `astro:page-load` para redirecciones
-  document.addEventListener('DOMContentLoaded', waitForUIReady);
-  document.addEventListener('astro:page-load', waitForUIReady);
+  // Verificar si el DOM está completamente cargado
+  document.addEventListener('astro:page-load', initializeArrowIndicator);
+  document.addEventListener('DOMContentLoaded', initializeArrowIndicator);
 </script>
+
 
 
 

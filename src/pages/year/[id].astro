@@ -213,57 +213,41 @@ filteredPlayers.sort((a, b) => {
 
 <script>
 	function initializeDropdown() {
-	  const dropdownButton = document.getElementById('dropdown-button');
+	  const dropdownButton = document.getElementById('dropdown-button') as HTMLElement & { _toggleDropdown?: () => void, _closeDropdown?: (event: MouseEvent) => void };
 	  const dropdownMenu = document.getElementById('dropdown-menu');
 
-	  // Verificar si los elementos existen antes de agregar eventos
-	  if (dropdownButton !== null && dropdownMenu !== null) {
-		// Limpiar cualquier evento existente
-		cleanupDropdownEvents(dropdownButton);
+	  if (!dropdownButton || !dropdownMenu) return;
 
-		// Definir las funciones de evento solo si los elementos son no nulos
-		function toggleDropdown() {
-		  if (dropdownMenu !== null) {
+	  // Limpiar cualquier evento existente
+	  cleanupDropdownEvents(dropdownButton);
+
+	  function toggleDropdown() {
+		if (dropdownMenu) {
 			dropdownMenu.classList.toggle('hidden');
-		  }
 		}
+	  }
 
-		function closeDropdown(event: MouseEvent) {
-		  if (dropdownButton !== null && dropdownMenu !== null) {
-			if (!dropdownButton.contains(event.target as Node) && !dropdownMenu.contains(event.target as Node)) {
-			  dropdownMenu.classList.add('hidden');
-			}
-		  }
+	  function closeDropdown(event: MouseEvent) {
+		if (dropdownButton && dropdownMenu && !dropdownButton.contains(event.target as Node) && !dropdownMenu.contains(event.target as Node)) {
+		  dropdownMenu.classList.add('hidden');
 		}
+	  }
 
-		// Añadir eventos
-		dropdownButton.addEventListener('click', toggleDropdown);
-		document.addEventListener('click', closeDropdown);
+	  dropdownButton.addEventListener('click', toggleDropdown);
+	  document.addEventListener('click', closeDropdown);
 
-		// Guardar las funciones en el elemento para poder limpiarlas más tarde
-		(dropdownButton as any)._toggleDropdown = toggleDropdown;
-		(dropdownButton as any)._closeDropdown = closeDropdown;
+	  dropdownButton._toggleDropdown = toggleDropdown;
+	  dropdownButton._closeDropdown = closeDropdown;
+	}
+
+	function cleanupDropdownEvents(dropdownButton: HTMLElement & { _toggleDropdown?: () => void, _closeDropdown?: (event: MouseEvent) => void }) {
+	  if (dropdownButton._toggleDropdown) {
+		dropdownButton.removeEventListener('click', dropdownButton._toggleDropdown);
+		document.removeEventListener('click', dropdownButton._closeDropdown as (event: MouseEvent) => void);
 	  }
 	}
 
-	// Función para eliminar los eventos de un dropdown específico
-	function cleanupDropdownEvents(dropdownButton: HTMLElement) {
-	  if ((dropdownButton as any)._toggleDropdown) {
-		dropdownButton.removeEventListener('click', (dropdownButton as any)._toggleDropdown);
-		document.removeEventListener('click', (dropdownButton as any)._closeDropdown);
-	  }
-	}
-
-	// Esperar a que la UI esté completamente lista para inicializar el dropdown
-	function waitForUIReady() {
-		if (document.readyState === 'complete') {
-			initializeDropdown();
-		} else {
-			requestAnimationFrame(waitForUIReady);
-		}
-	}
-
-	// Inicialización cuando la página se carga o después de redirección
-	document.addEventListener("DOMContentLoaded", waitForUIReady);
-	document.addEventListener("astro:page-load", waitForUIReady);
+	// Asegurarse de que el DOM esté completamente listo
+	document.addEventListener("astro:page-load", initializeDropdown);
+	document.addEventListener("DOMContentLoaded", initializeDropdown);
 </script>
