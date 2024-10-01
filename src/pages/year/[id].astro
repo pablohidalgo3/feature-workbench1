@@ -254,6 +254,8 @@ filteredPlayers.sort((a, b) => {
 	  }
 	}
 
-	// Inicialización cuando la página se carga
+	// Inicialización cuando la página se carga o después de redirección
+	document.addEventListener("DOMContentLoaded", initializeDropdown);
 	document.addEventListener("astro:page-load", initializeDropdown);
 </script>
+

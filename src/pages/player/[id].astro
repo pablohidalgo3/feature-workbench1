@@ -53,9 +53,11 @@ const { Content } = await render(player);
     observer.observe(contentSection);
   }
 
-  // Usar `astro:page-load` para que se inicialice cada vez que navegues entre páginas
+  // Usar `DOMContentLoaded` para la primera carga y `astro:page-load` para redirecciones
+  document.addEventListener('DOMContentLoaded', initializeArrowIndicator);
   document.addEventListener('astro:page-load', initializeArrowIndicator);
 </script>
+
 
 <style>
   @keyframes bounce {
