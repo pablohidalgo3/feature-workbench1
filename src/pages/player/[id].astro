@@ -53,10 +53,20 @@ const { Content } = await render(player);
     observer.observe(contentSection);
   }
 
+  // Esperar a que la UI esté completamente lista para inicializar la flecha
+  function waitForUIReady() {
+    if (document.readyState === 'complete') {
+      initializeArrowIndicator();
+    } else {
+      requestAnimationFrame(waitForUIReady);
+    }
+  }
+
   // Usar `DOMContentLoaded` para la primera carga y `astro:page-load` para redirecciones
-  document.addEventListener('DOMContentLoaded', initializeArrowIndicator);
-  document.addEventListener('astro:page-load', initializeArrowIndicator);
+  document.addEventListener('DOMContentLoaded', waitForUIReady);
+  document.addEventListener('astro:page-load', waitForUIReady);
 </script>
+
 
 
 <style>

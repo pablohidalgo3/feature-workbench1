@@ -254,8 +254,16 @@ filteredPlayers.sort((a, b) => {
 	  }
 	}
 
-	// Inicialización cuando la página se carga o después de redirección
-	document.addEventListener("DOMContentLoaded", initializeDropdown);
-	document.addEventListener("astro:page-load", initializeDropdown);
-</script>
+	// Esperar a que la UI esté completamente lista para inicializar el dropdown
+	function waitForUIReady() {
+		if (document.readyState === 'complete') {
+			initializeDropdown();
+		} else {
+			requestAnimationFrame(waitForUIReady);
+		}
+	}
 
+	// Inicialización cuando la página se carga o después de redirección
+	document.addEventListener("DOMContentLoaded", waitForUIReady);
+	document.addEventListener("astro:page-load", waitForUIReady);
+</script>
