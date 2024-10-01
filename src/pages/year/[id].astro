@@ -24,7 +24,7 @@ const selectedYear = id ? id : '2016.1';
 
 // Lista de años desde 2016 (dividido en 3) hasta 2024
 const years = [
-  '2016.1', '2016.2', '2016.3', 
+  '2016.1', '2016.2', '2016.3',
   ...Array.from({ length: 2024 - 2017 + 1 }, (_, i) => (2017 + i).toString())
 ];
 
@@ -213,41 +213,49 @@ filteredPlayers.sort((a, b) => {
 
 <script>
 	function initializeDropdown() {
-	  const dropdownButton = document.getElementById('dropdown-button') as HTMLElement & { _toggleDropdown?: () => void, _closeDropdown?: (event: MouseEvent) => void };
-	  const dropdownMenu = document.getElementById('dropdown-menu');
+		const dropdownButton = document.getElementById('dropdown-button');
+		const dropdownMenu = document.getElementById('dropdown-menu');
 
-	  if (!dropdownButton || !dropdownMenu) return;
+		// Verificar si los elementos existen antes de agregar eventos
+		if (dropdownButton && dropdownMenu) {
+			// Limpiar cualquier evento existente para evitar duplicados
+			cleanupDropdownEvents(dropdownButton);
 
-	  // Limpiar cualquier evento existente
-	  cleanupDropdownEvents(dropdownButton);
+			// Definir las funciones de evento solo si los elementos existen
+			const toggleDropdown = () => {
+			if (dropdownMenu) {
+				dropdownMenu.classList.toggle('hidden');
+			}
+			};
 
-	  function toggleDropdown() {
-		if (dropdownMenu) {
-			dropdownMenu.classList.toggle('hidden');
+			const closeDropdown = (event: Event) => {
+			if (dropdownButton && dropdownMenu && event.target instanceof Node) {
+				if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+				dropdownMenu.classList.add('hidden');
+				}
+			}
+			};
+
+			// Añadir eventos
+			dropdownButton.addEventListener('click', toggleDropdown);
+			document.addEventListener('click', closeDropdown);
+
+			// Guardar las funciones en el elemento para poder limpiarlas más tarde
+			(dropdownButton as any)._toggleDropdown = toggleDropdown;
+			(dropdownButton as any)._closeDropdown = closeDropdown;
 		}
-	  }
-
-	  function closeDropdown(event: MouseEvent) {
-		if (dropdownButton && dropdownMenu && !dropdownButton.contains(event.target as Node) && !dropdownMenu.contains(event.target as Node)) {
-		  dropdownMenu.classList.add('hidden');
 		}
-	  }
 
-	  dropdownButton.addEventListener('click', toggleDropdown);
-	  document.addEventListener('click', closeDropdown);
+		// Función para eliminar los eventos de un dropdown específico
+		function cleanupDropdownEvents(dropdownButton: HTMLElement) {
+		if ((dropdownButton as any)._toggleDropdown) {
+			dropdownButton.removeEventListener('click', (dropdownButton as any)._toggleDropdown);
+			document.removeEventListener('click', (dropdownButton as any)._closeDropdown);
+		}
+		}
 
-	  dropdownButton._toggleDropdown = toggleDropdown;
-	  dropdownButton._closeDropdown = closeDropdown;
-	}
+		// Inicialización cuando la página se carga
+		document.addEventListener('astro:page-load', initializeDropdown);
+		document.addEventListener('DOMContentLoaded', initializeDropdown);
 
-	function cleanupDropdownEvents(dropdownButton: HTMLElement & { _toggleDropdown?: () => void, _closeDropdown?: (event: MouseEvent) => void }) {
-	  if (dropdownButton._toggleDropdown) {
-		dropdownButton.removeEventListener('click', dropdownButton._toggleDropdown);
-		document.removeEventListener('click', dropdownButton._closeDropdown as (event: MouseEvent) => void);
-	  }
-	}
-
-	// Asegurarse de que el DOM esté completamente listo
-	document.addEventListener("astro:page-load", initializeDropdown);
-	document.addEventListener("DOMContentLoaded", initializeDropdown);
 </script>

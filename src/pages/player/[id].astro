@@ -17,45 +17,6 @@ const { nickname, name, country, birthday, age, team, position, img } = data;
 
 const { Content } = await render(player);
 ---
-
-<script>
-  function initializeArrowIndicator() {
-    const contentSection = document.querySelector('#content-section');
-    const arrowIndicator = document.querySelector('#arrow-indicator');
-
-    if (!contentSection || !arrowIndicator) return;
-
-    const observerOptions = {
-      root: null,
-      threshold: 0.1, 
-    };
-
-    function handleArrowVisibility(entries: any[]) {
-      entries.forEach((entry: { isIntersecting: any; }) => {
-        if (entry.isIntersecting) {
-          if (arrowIndicator) {
-            (arrowIndicator as HTMLElement).style.display = 'none';
-          }
-        } else {
-          if (arrowIndicator) {
-            (arrowIndicator as HTMLElement).style.display = 'flex';
-          }
-        }
-      });
-    }
-
-    const observer = new IntersectionObserver(handleArrowVisibility, observerOptions);
-    observer.observe(contentSection);
-  }
-
-  // Verificar si el DOM está completamente cargado
-  document.addEventListener('astro:page-load', initializeArrowIndicator);
-  document.addEventListener('DOMContentLoaded', initializeArrowIndicator);
-</script>
-
-
-
-
 <style>
   @keyframes bounce {
     0%, 100% {
@@ -92,3 +53,36 @@ const { Content } = await render(player);
     ↓
   </div>
 </Layout>
+
+<script>
+    function initializeArrowIndicator() {
+      const contentSection = document.querySelector('#content-section');
+      const arrowIndicator = document.querySelector('#arrow-indicator');
+
+      if (!contentSection || !arrowIndicator) return;
+
+      const observerOptions = {
+        root: null,
+        threshold: 0.1, // Detectar cuando el contenido es visible
+      };
+
+      function handleArrowVisibility(entries: any[]) {
+        entries.forEach((entry: { isIntersecting: any; }) => {
+          if (entry.isIntersecting) {
+            if (arrowIndicator) {
+                (arrowIndicator as HTMLElement).style.display = 'none'; // Ocultar flecha si el contenido es visible
+            }
+          } else {
+            (arrowIndicator as HTMLElement).style.display = 'flex'; // Mostrar flecha si el contenido no es visible
+          }
+        });
+      }
+
+      const observer = new IntersectionObserver(handleArrowVisibility, observerOptions);
+      observer.observe(contentSection);
+    }
+
+    document.addEventListener('astro:page-load', initializeArrowIndicator);
+    document.addEventListener('DOMContentLoaded', initializeArrowIndicator);
+
+</script>
