@@ -17,6 +17,7 @@ const { nickname, name, country, birthday, age, team, position, img } = data;
 
 const { Content } = await render(player);
 ---
+
 <style>
   @keyframes bounce {
     0%, 100% {
@@ -26,63 +27,84 @@ const { Content } = await render(player);
       transform: translateY(-10px);
     }
   }
+
+  .scroll-arrow {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    animation: bounce 2s infinite;
+  }
+
+  .scroll-arrow svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  @media (min-width: 768px) {
+    .scroll-arrow {
+      display: none;
+    }
+  }
 </style>
 
 <Layout title={`Player - ${nickname}`}>
   <div class="flex flex-col md:flex-row gap-12 justify-center items-center md:items-start">
-    <!-- La imagen se coloca encima en pantallas móviles y a la izquierda en pantallas más grandes -->
     <aside class="flex flex-col items-center gap-4 md:items-start">
-      <img transition:name={`img-${slug}`} class="rounded w-48 h-auto md:w-72" src={`/${img}`} alt="{name}" />
+      <img transition:name={`img-${slug}`} class="rounded w-48 h-auto md:w-72" src={`/${img}`} alt={name} />
     </aside>
 
-    <!-- Contenido -->
     <main class="text-center md:text-left max-w-3xl mt-6 md:mt-0">
       <h1 transition:name={`nickname-${slug}`} class="text-3xl md:text-4xl font-bold mb-4">{nickname}</h1>
       <h1 transition:name={`name-${slug}`} class="text-xl md:text-2xl font-bold mb-4">{name}</h1>
       <h1 class="text-xl md:text-2xl font-bold mb-8">{position}</h1>
 
-      <!-- `prose` y `prose-invert` solo se aplican en pantallas md y superiores -->
       <div id="content-section" class="space-y-4 md:prose md:prose-invert">
         <Content />
       </div>
     </main>
   </div>
 
-  <!-- Flecha indicativa en pantallas móviles -->
-  <div id="arrow-indicator" class="md:hidden fixed bottom-4 right-4 w-12 h-12 flex items-center justify-center bg-black/40 text-white rounded-full animate-bounce text-3xl font-bold" style="animation-duration: 2s;">
-    ↓
+  <div id="scroll-arrow" class="scroll-arrow opacity-0">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+    </svg>
   </div>
 </Layout>
 
 <script>
-    function initializeArrowIndicator() {
-      const contentSection = document.querySelector('#content-section');
-      const arrowIndicator = document.querySelector('#arrow-indicator');
+  const scrollArrow = document.getElementById('scroll-arrow');
+  const contentSection = document.getElementById('content-section');
 
-      if (!contentSection || !arrowIndicator) return;
-
-      const observerOptions = {
-        root: null,
-        threshold: 0.1, // Detectar cuando el contenido es visible
-      };
-
-      function handleArrowVisibility(entries: any[]) {
-        entries.forEach((entry: { isIntersecting: any; }) => {
-          if (entry.isIntersecting) {
-            if (arrowIndicator) {
-                (arrowIndicator as HTMLElement).style.display = 'none'; // Ocultar flecha si el contenido es visible
-            }
-          } else {
-            (arrowIndicator as HTMLElement).style.display = 'flex'; // Mostrar flecha si el contenido no es visible
-          }
-        });
+  if (scrollArrow instanceof HTMLElement && contentSection instanceof HTMLElement) {
+    function checkScroll() {
+      const contentRect = contentSection ? contentSection.getBoundingClientRect() : { top: 0, bottom: 0 };
+      const isContentVisible = contentRect.top < window.innerHeight && contentRect.bottom >= 0;
+      
+      if (scrollArrow) {
+        scrollArrow.style.opacity = isContentVisible ? '0' : '1';
       }
-
-      const observer = new IntersectionObserver(handleArrowVisibility, observerOptions);
-      observer.observe(contentSection);
     }
 
-    document.addEventListener('astro:page-load', initializeArrowIndicator);
-    document.addEventListener('DOMContentLoaded', initializeArrowIndicator);
+    window.addEventListener('scroll', checkScroll);
+    window.addEventListener('resize', checkScroll);
 
+    // Check initial position
+    checkScroll();
+
+    // Smooth scrolling when clicking the arrow
+    scrollArrow.addEventListener('click', () => {
+      contentSection.scrollIntoView({ behavior: 'smooth' });
+    });
+  } else {
+    console.error('Required elements not found');
+  }
 </script>
