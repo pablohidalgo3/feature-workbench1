@@ -63,34 +63,18 @@ filteredPlayers.sort((a, b) => {
 <Layout title="G2 Esports Playerbase">
 	<main class="flex flex-col items-center">
 	  <section aria-label="Jugadores de G2 Esports">
-		<h1 class="text-3xl font-bold text-center mb-10">{getYearLabel(selectedYear)} roster</h1>
+		<h1 class="text-3xl font-bold text-center mb-4">{getYearLabel(selectedYear)} roster</h1>
 
-		<!-- Selector de año para móviles (visible solo en pantallas pequeñas) -->
-		<div class="sm:hidden mb-6 flex justify-center">
-			<!-- Caja que imita el estilo de un <select> -->
-			<div class="relative inline-block w-auto h-8 bg-gray-800 text-white text-center border-gray-500 rounded-full px-4">
-			  <button class="w-auto h-full flex items-center justify-center focus:outline-none px-2" id="dropdown-button">
-				{getYearLabel(selectedYear)} <!-- Mostrar el año seleccionado -->
-				<svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-				  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-				</svg>
-			  </button>
-	
-			  <!-- Lista desplegable que contiene los años como enlaces -->
-			  <ul id="dropdown-menu" class="absolute left-0 mt-1 w-auto bg-gray-800 text-white rounded-lg hidden z-10 shadow-lg">
-				{years.map(year => (
-				  <li>
-					<a 
-					  href={`/year/${year}`} 
-					  class={`block px-4 py-1 hover:bg-gray-700 text-center rounded-lg ${year === selectedYear ? 'bg-yellow-500' : ''}`}
-					>
-					  {getYearLabel(year)}
-					</a>
-				  </li>
-				))}
-			  </ul>
-			</div>
-		  </div>
+        <!-- Selector de año para móviles -->
+        <div class="sm:hidden mb-6 flex justify-center">
+          <select id="yearSelector" class="bg-gray-700 text-white border border-gray-600 rounded-full px-4 py-2 w-64 text-center appearance-none bg-no-repeat bg-right-center">
+            {years.map(year => (
+              <option value={year} selected={year === selectedYear}>
+                {getYearLabel(year)}
+              </option>
+            ))}
+          </select>
+        </div>
 
 		<!-- Para pantallas móviles (sm:hidden) -->
 		<div class="px-4 sm:hidden mx-auto max-w-screen-xl">
@@ -201,7 +185,7 @@ filteredPlayers.sort((a, b) => {
 		<div class="hidden sm:flex justify-center mt-24 gap-2">
 			{years.map(year => (
 			  <a href={`/year/${year}`} 
-				 class={`px-4 py-2 border ${year === selectedYear ? 'border-yellow-500 text-yellow-500' : 'border-gray-300 text-gray-500'} rounded hover:text-white`}>
+				 class={`px-4 py-2 border rounded hover:text-white ${year === selectedYear ? 'border-yellow-500 text-yellow-500' : 'border-gray-300 text-gray-500'}`}>
 				{getYearLabel(year)}
 			  </a>
 			))}
@@ -211,51 +195,22 @@ filteredPlayers.sort((a, b) => {
 	</main>
 </Layout>
 
+<style>
+  #yearSelector {
+    background-size: 1.5rem auto;
+  }
+</style>
+
 <script>
-	function initializeDropdown() {
-		const dropdownButton = document.getElementById('dropdown-button');
-		const dropdownMenu = document.getElementById('dropdown-menu');
+  import { navigate } from 'astro:transitions/client';
 
-		// Verificar si los elementos existen antes de agregar eventos
-		if (dropdownButton && dropdownMenu) {
-			// Limpiar cualquier evento existente para evitar duplicados
-			cleanupDropdownEvents(dropdownButton);
-
-			// Definir las funciones de evento solo si los elementos existen
-			const toggleDropdown = () => {
-			if (dropdownMenu) {
-				dropdownMenu.classList.toggle('hidden');
-			}
-			};
-
-			const closeDropdown = (event: Event) => {
-			if (dropdownButton && dropdownMenu && event.target instanceof Node) {
-				if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
-				dropdownMenu.classList.add('hidden');
-				}
-			}
-			};
-
-			// Añadir eventos
-			dropdownButton.addEventListener('click', toggleDropdown);
-			document.addEventListener('click', closeDropdown);
-
-			// Guardar las funciones en el elemento para poder limpiarlas más tarde
-			(dropdownButton as any)._toggleDropdown = toggleDropdown;
-			(dropdownButton as any)._closeDropdown = closeDropdown;
-		}
-		}
-
-		// Función para eliminar los eventos de un dropdown específico
-		function cleanupDropdownEvents(dropdownButton: HTMLElement) {
-		if ((dropdownButton as any)._toggleDropdown) {
-			dropdownButton.removeEventListener('click', (dropdownButton as any)._toggleDropdown);
-			document.removeEventListener('click', (dropdownButton as any)._closeDropdown);
-		}
-		}
-
-		// Inicialización cuando la página se carga
-		document.addEventListener('astro:page-load', initializeDropdown);
-		document.addEventListener('DOMContentLoaded', initializeDropdown);
-
+  document.addEventListener('astro:page-load', () => {
+    const yearSelector = document.getElementById('yearSelector') as HTMLSelectElement;
+    if (yearSelector) {
+      yearSelector.addEventListener('change', (event) => {
+        const selectedYear = (event.target as HTMLSelectElement).value;
+        navigate(`/year/${selectedYear}`);
+      });
+    }
+  });
 </script>
