@@ -31,7 +31,7 @@ const currentYear = new Date().getFullYear().toString();
         </li>
         <li id="activeroster">
           <a
-            href="/activeroster" rel="prefetch"
+            href="/activeroster"
             class="transition-all duration-300"
             ><span
               class="text-white font-bold pl-1.5 pt-1.5 pb-1.5 rounded-l transition-colors"
@@ -43,7 +43,7 @@ const currentYear = new Date().getFullYear().toString();
             ></a
           >
         </li>
-        <li><a href={`/year/${currentYear}`} rel="prefetch">Former Rosters</a></li>
+        <li><a href={`/year/${currentYear}`}>Former Rosters</a></li>
         <li><a href="#">History</a></li>
       </ul>
     </div>
@@ -73,8 +73,8 @@ const currentYear = new Date().getFullYear().toString();
   <!-- Menú horizontal siempre visible -->
   <nav class="bg-gray-900 text-white rounded-full px-4 py-2 w-full flex justify-around shadow-lg">
     <a href="/" class="text-sm hover:text-gray-300 transition-all">Home</a>
-    <a href="/activeroster" rel="prefetch" class="text-sm hover:text-gray-300 transition-all">Active Roster</a>
-    <a href={`/year/${currentYear}`} rel="prefetch" class="text-sm hover:text-gray-300 transition-all">Former Rosters</a>
+    <a href="/activeroster" class="text-sm hover:text-gray-300 transition-all">Active Roster</a>
+    <a href={`/year/${currentYear}`} class="text-sm hover:text-gray-300 transition-all">Former Rosters</a>
     <a href="#" class="text-sm hover:text-gray-300 transition-all">History</a>
   </nav>
 </header>

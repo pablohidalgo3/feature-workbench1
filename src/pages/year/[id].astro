@@ -272,7 +272,7 @@ export async function getStaticPaths() {
           {
             years.map((year: { year_identifier: any; label: unknown }) => (
               <a
-                href={`/year/${year.year_identifier}`} rel="prefetch"
+                href={`/year/${year.year_identifier}`}
                 class={`px-4 py-2 border rounded hover:text-white ${
                   year.year_identifier === selectedYear
                     ? "border-yellow-500 text-yellow-500"
