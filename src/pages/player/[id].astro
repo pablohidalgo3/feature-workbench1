@@ -1,26 +1,41 @@
 ---
-import { getCollection, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 
 export async function getStaticPaths() {
-    const players = await getCollection("players");
+  // Llamar a la API para obtener los jugadores
+  const response = await fetch("https://g2historyapi.vercel.app/players");
+  if (!response.ok) {
+    throw new Error("Error al obtener los jugadores");
+  }
 
-    return players.map((player) => ({
-        params: { id: player.slug },
-        props: { player }
-    }));
+  const players = await response.json();
+
+  // Generar rutas dinámicas basadas en los nicknames
+  return players.map((player: { nickname: string; }) => ({
+    params: { id: player.nickname.replace(/\s+/g, '-') }, // Reemplazar espacios por guiones
+    props: { player },
+}));
 }
 
 const { player } = Astro.props;
-const { data, slug } = player;
-const { nickname, name, country, birthday, age, team, position, img } = data;
-
-const { Content } = await render(player);
+const {
+  nickname,
+  name,
+  country,
+  birthday,
+  age,
+  team,
+  position,
+  img,
+  trivia,
+  titles,
+} = player;
 ---
 
 <style>
   @keyframes bounce {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateY(0);
     }
     50% {
@@ -57,54 +72,100 @@ const { Content } = await render(player);
 </style>
 
 <Layout title={`Player - ${nickname}`}>
-  <div class="flex flex-col md:flex-row gap-12 justify-center items-center md:items-start">
+  <div
+    class="flex flex-col md:flex-row gap-12 justify-center items-center md:items-start"
+  >
     <aside class="flex flex-col items-center gap-4 md:items-start">
-      <img transition:name={`img-${slug}`} class="rounded w-48 h-auto md:w-72" src={`/${img}`} alt={name} />
+      <img
+        transition:name={`img-${nickname}`}
+        class="rounded w-48 h-auto md:w-72"
+        src={img}
+        alt={name}
+      />
     </aside>
 
     <main class="text-center md:text-left max-w-3xl mt-6 md:mt-0">
-      <h1 transition:name={`nickname-${slug}`} class="text-3xl md:text-4xl font-bold mb-4">{nickname}</h1>
-      <h1 transition:name={`name-${slug}`} class="text-xl md:text-2xl font-bold mb-4">{name}</h1>
+      <h1
+        transition:name={`nickname-${nickname}`}
+        class="text-3xl md:text-4xl font-bold mb-4"
+      >
+        {nickname}
+      </h1>
+      <h1
+        transition:name={`name-${nickname}`}
+        class="text-xl md:text-2xl font-bold mb-4"
+      >
+        {name}
+      </h1>
       <h1 class="text-xl md:text-2xl font-bold mb-8">{position}</h1>
 
-      <div id="content-section" class="md:mt-20 mt-28 space-y-4 md:prose md:prose-invert">
-        <Content />
+      <p class="text-lg text-gray-400">Country: {country}</p>
+      <p class="text-lg text-gray-400">Team: {team}</p>
+      <p class="text-lg text-gray-400">Birthday: {birthday}</p>
+      <p class="text-lg text-gray-400">Age: {age}</p>
+      <p class="text-lg text-gray-400">
+        Trivia: {trivia || "No trivia available"}
+      </p>
+      <p class="text-lg text-gray-400">
+        Titles: {titles || "No titles available"}
+      </p>
+
+      <div
+        id="content-section"
+        class="md:mt-20 mt-28 space-y-4 md:prose md:prose-invert"
+      >
+        <p>Additional player content can go here.</p>
       </div>
     </main>
   </div>
 
   <div id="scroll-arrow" class="scroll-arrow opacity-0">
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
     </svg>
   </div>
 </Layout>
 
 <script>
-  const scrollArrow = document.getElementById('scroll-arrow');
-  const contentSection = document.getElementById('content-section');
+  const scrollArrow = document.getElementById("scroll-arrow");
+  const contentSection = document.getElementById("content-section");
 
-  if (scrollArrow instanceof HTMLElement && contentSection instanceof HTMLElement) {
+  if (
+    scrollArrow instanceof HTMLElement &&
+    contentSection instanceof HTMLElement
+  ) {
     function checkScroll() {
-      const contentRect = contentSection ? contentSection.getBoundingClientRect() : { top: 0, bottom: 0 };
-      const isContentVisible = contentRect.top < window.innerHeight && contentRect.bottom >= 0;
-      
+      const contentRect = contentSection
+        ? contentSection.getBoundingClientRect()
+        : { top: 0, bottom: 0 };
+      const isContentVisible =
+        contentRect.top < window.innerHeight && contentRect.bottom >= 0;
+
       if (scrollArrow) {
-        scrollArrow.style.opacity = isContentVisible ? '0' : '1';
+        scrollArrow.style.opacity = isContentVisible ? "0" : "1";
       }
     }
 
-    window.addEventListener('scroll', checkScroll);
-    window.addEventListener('resize', checkScroll);
+    window.addEventListener("scroll", checkScroll);
+    window.addEventListener("resize", checkScroll);
 
     // Check initial position
     checkScroll();
 
     // Smooth scrolling when clicking the arrow
-    scrollArrow.addEventListener('click', () => {
-      contentSection.scrollIntoView({ behavior: 'smooth' });
+    scrollArrow.addEventListener("click", () => {
+      contentSection.scrollIntoView({ behavior: "smooth" });
     });
   } else {
-    console.error('Required elements not found');
+    console.error("Required elements not found");
   }
 </script>

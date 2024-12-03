@@ -1,5 +1,6 @@
 ---
 import Logo from "./Logo.astro";
+const currentYear = new Date().getFullYear().toString();
 ---
 
 <header
@@ -30,7 +31,7 @@ import Logo from "./Logo.astro";
         </li>
         <li id="activeroster">
           <a
-            href="/activeroster"
+            href="/activeroster" rel="prefetch"
             class="transition-all duration-300"
             ><span
               class="text-white font-bold pl-1.5 pt-1.5 pb-1.5 rounded-l transition-colors"
@@ -42,7 +43,7 @@ import Logo from "./Logo.astro";
             ></a
           >
         </li>
-        <li><a href={`/year/2024`}>Former Rosters</a></li>
+        <li><a href={`/year/${currentYear}`} rel="prefetch">Former Rosters</a></li>
         <li><a href="#">History</a></li>
       </ul>
     </div>
@@ -72,8 +73,8 @@ import Logo from "./Logo.astro";
   <!-- Menú horizontal siempre visible -->
   <nav class="bg-gray-900 text-white rounded-full px-4 py-2 w-full flex justify-around shadow-lg">
     <a href="/" class="text-sm hover:text-gray-300 transition-all">Home</a>
-    <a href="/activeroster" class="text-sm hover:text-gray-300 transition-all">Active Roster</a>
-    <a href="/year/2024" class="text-sm hover:text-gray-300 transition-all">Former Rosters</a>
+    <a href="/activeroster" rel="prefetch" class="text-sm hover:text-gray-300 transition-all">Active Roster</a>
+    <a href={`/year/${currentYear}`} rel="prefetch" class="text-sm hover:text-gray-300 transition-all">Former Rosters</a>
     <a href="#" class="text-sm hover:text-gray-300 transition-all">History</a>
   </nav>
 </header>

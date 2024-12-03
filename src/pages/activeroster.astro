@@ -1,149 +1,220 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { getCollection } from 'astro:content';
+import Layout from "../layouts/Layout.astro";
 
 // Definir el orden de las posiciones
 const positionOrder: Record<string, number> = {
-  'Top': 1,
-  'Jungler': 2,
-  'Mid': 3,
-  'Adc': 4,
-  'Support': 5
+  Top: 1,
+  Jungler: 2,
+  Mid: 3,
+  Adc: 4,
+  Support: 5,
 };
 
-const players = await getCollection('players');
+// URL de la API
+const PLAYERS_API_URL = "https://g2historyapi.vercel.app/players";
 
-const filteredPlayers = players.filter(player => player.data.years.includes("2024"));
+// Calcular el año actual
+const currentYear = new Date().getFullYear();
 
-// Filtrar y ordenar los jugadores
-filteredPlayers.sort((a, b) => {
-  const positionA = positionOrder[a.data.position as keyof typeof positionOrder] || 999;
-  const positionB = positionOrder[b.data.position as keyof typeof positionOrder] || 999;
-  return positionA - positionB;
-});
+let players = [];
 
+try {
+  // Llamada a la API para obtener los jugadores
+  const response = await fetch(PLAYERS_API_URL);
+
+  if (!response.ok) {
+    throw new Error("Error al obtener los jugadores");
+  }
+
+  const data = await response.json();
+
+  // Filtrar los jugadores que pertenecen al año actual
+  const filteredPlayers = data.filter((player: { years: string | string[] }) =>
+    player.years.includes(currentYear.toString())
+  );
+
+  // Ordenar los jugadores por posición
+  players = filteredPlayers.sort(
+    (a: { position: string | number }, b: { position: string | number }) => {
+      const positionA = positionOrder[a.position] || 999;
+      const positionB = positionOrder[b.position] || 999;
+      return positionA - positionB;
+    }
+  );
+} catch (error) {
+  if (error instanceof Error) {
+    console.error("Error al obtener los jugadores:", error.message);
+  } else {
+    console.error("Error al obtener los jugadores:", error);
+  }
+}
 ---
 
 <Layout title="G2 Esports Playerbase">
-	<main class="flex flex-col items-center">
-	  <section aria-label="Jugadores de G2 Esports">
-		<h1 class="text-3xl font-bold text-center mb-10">Current roster</h1>
-		<!-- Para pantallas móviles (sm:hidden) -->
-		<div class="px-4 sm:hidden mx-auto max-w-screen-xl">
-		  <div class="grid gap-6 md:grid-cols-3">
-			{
-			  filteredPlayers.map(player => {
-				const { slug, data } = player;
-				const { nickname, name, position, img } = data;
-  
-				return (
-				  <article class="flex">
-					<a href={`/player/${slug}`} class="mb-2 xl:mb-0 transition hover:scale-110">
-					  <img
-						transition:name={`img-${slug}`}
-						class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
-						src={`/${img}`}
-						alt={name}
-					  />
-					</a>
-  
-					<div class="flex flex-col justify-center">
-					  <h1 transition:name={`nickname-${slug}`} class="mb-2 text-4xl font-bold leading-tight text-white">
-						{nickname}
-					  </h1>
-					  <h2 transition:name={`name-${slug}`} class="mb-2 text-2xl font-bold leading-tight text-white">
-						{name}
-					  </h2>
-  
-					  <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
-					</div>
-				  </article>
-				);
-			  })
-			}
-		  </div>
-		</div>
-  
-		<!-- Para pantallas mayores que móviles (sm:block y superiores) -->
-		<div class="px-4 hidden sm:block mx-auto max-w-screen-xl">
-		  <!-- Primera fila con 3 jugadores -->
-		  <div class="grid gap-6 grid-cols-3">
-			{
-			  filteredPlayers.slice(0, 3).map(player => {
-				const { slug, data } = player;
-				const { nickname, name, position, img } = data;
-  
-				return (
-				  <article class="flex">
-					<a href={`/player/${slug}`} class="mb-2 xl:mb-0 transition hover:scale-110">
-					  <img
-						transition:name={`img-${slug}`}
-						class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
-						src={`/${img}`}
-						alt={name}
-					  />
-					</a>
-  
-					<div class="flex flex-col justify-center">
-					  <h1 transition:name={`nickname-${slug}`} class="mb-2 text-4xl font-bold leading-tight text-white">
-						{nickname}
-					  </h1>
-					  <h2 transition:name={`name-${slug}`} class="mb-2 text-2xl font-bold leading-tight text-white">
-						{name}
-					  </h2>
-  
-					  <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
-					</div>
-				  </article>
-				);
-			  })
-			}
-		  </div>
-  
-		  <!-- Segunda fila con 2 jugadores -->
-		  <div class="flex gap-6 mt-8 justify-center">
-			{
-			  filteredPlayers.slice(3, 5).map(player => {
-				const { slug, data } = player;
-				const { nickname, name, position, img } = data;
-  
-				return (
-				  <article class="flex">
-					<a href={`/player/${slug}`} class="mb-2 xl:mb-0 transition hover:scale-110">
-					  <img
-						transition:name={`img-${slug}`}
-						class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
-						src={`/${img}`}
-						alt={name}
-					  />
-					</a>
-  
-					<div class="flex flex-col justify-center">
-					  <h1 transition:name={`nickname-${slug}`} class="mb-2 text-4xl font-bold leading-tight text-white">
-						{nickname}
-					  </h1>
-					  <h2 transition:name={`name-${slug}`} class="mb-2 text-2xl font-bold leading-tight text-white">
-						{name}
-					  </h2>
-  
-					  <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
-					</div>
-				  </article>
-				);
-			  })
-			}
-		  </div>
-		</div>
-  
-	  </section>
-	</main>
-  </Layout>
-  
+  <main class="flex flex-col items-center">
+    <section aria-label="Jugadores de G2 Esports">
+      <h1 class="text-3xl font-bold text-center mb-10">Current roster</h1>
+      <!-- Para pantallas móviles (sm:hidden) -->
+      <div class="px-4 sm:hidden mx-auto max-w-screen-xl">
+        <div class="grid gap-6 md:grid-cols-3">
+          {
+            players.map(
+              (player: {
+                nickname: any;
+                name: any;
+                position: any;
+                img: any;
+              }) => {
+                const { nickname, name, position, img } = player;
+                const normalizedNickname = nickname.replace(/\s+/g, "-"); // Reemplaza espacios por guiones
+                return (
+                  <article class="flex">
+                    <a
+                      href={`/player/${normalizedNickname}`}
+                      class="mb-2 xl:mb-0 transition hover:scale-110"
+                    >
+                      <img
+                        transition:name={`img-${nickname}`}
+                        class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
+                        src={img}
+                        alt={name}
+                      />
+                    </a>
+
+                    <div class="flex flex-col justify-center">
+                      <h1
+                        transition:name={`nickname-${nickname}`}
+                        class="mb-2 text-4xl font-bold leading-tight text-white"
+                      >
+                        {nickname}
+                      </h1>
+                      <h2
+                        transition:name={`name-${nickname}`}
+                        class="mb-2 text-2xl font-bold leading-tight text-white"
+                      >
+                        {name}
+                      </h2>
+
+                      <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
+                    </div>
+                  </article>
+                );
+              }
+            )
+          }
+        </div>
+      </div>
+
+      <!-- Para pantallas mayores que móviles (sm:block y superiores) -->
+      <div class="px-4 hidden sm:block mx-auto max-w-screen-xl">
+        <!-- Primera fila con 3 jugadores -->
+        <div class="grid gap-6 grid-cols-3">
+          {
+            players
+              .slice(0, 3)
+              .map(
+                (player: {
+                  nickname: any;
+                  name: any;
+                  position: any;
+                  img: any;
+                }) => {
+                  const { nickname, name, position, img } = player;
+                  const normalizedNickname = nickname.replace(/\s+/g, "-"); // Reemplaza espacios por guiones
+                  return (
+                    <article class="flex">
+                      <a
+                        href={`/player/${normalizedNickname}`}
+                        class="mb-2 xl:mb-0 transition hover:scale-110"
+                      >
+                        <img
+                          transition:name={`img-${nickname}`}
+                          class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
+                          src={img}
+                          alt={name}
+                        />
+                      </a>
+
+                      <div class="flex flex-col justify-center">
+                        <h1
+                          transition:name={`nickname-${nickname}`}
+                          class="mb-2 text-4xl font-bold leading-tight text-white"
+                        >
+                          {nickname}
+                        </h1>
+                        <h2
+                          transition:name={`name-${nickname}`}
+                          class="mb-2 text-2xl font-bold leading-tight text-white"
+                        >
+                          {name}
+                        </h2>
+
+                        <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
+                      </div>
+                    </article>
+                  );
+                }
+              )
+          }
+        </div>
+
+        <!-- Segunda fila con 2 jugadores -->
+        <div class="flex gap-6 mt-8 justify-center">
+          {
+            players
+              .slice(3, 5)
+              .map(
+                (player: {
+                  nickname: any;
+                  name: any;
+                  position: any;
+                  img: any;
+                }) => {
+                  const { nickname, name, position, img } = player;
+                  const normalizedNickname = nickname.replace(/\s+/g, "-"); // Reemplaza espacios por guiones
+                  return (
+                    <article class="flex">
+                      <a
+                        href={`/player/${normalizedNickname}`}
+                        class="mb-2 xl:mb-0 transition hover:scale-110"
+                      >
+                        <img
+                          transition:name={`img-${nickname}`}
+                          class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
+                          src={img}
+                          alt={name}
+                        />
+                      </a>
+
+                      <div class="flex flex-col justify-center">
+                        <h1
+                          transition:name={`nickname-${nickname}`}
+                          class="mb-2 text-4xl font-bold leading-tight text-white"
+                        >
+                          {nickname}
+                        </h1>
+                        <h2
+                          transition:name={`name-${nickname}`}
+                          class="mb-2 text-2xl font-bold leading-tight text-white"
+                        >
+                          {name}
+                        </h2>
+
+                        <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
+                      </div>
+                    </article>
+                  );
+                }
+              )
+          }
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
 
 <style>
-    img {
-        filter: drop-shadow(
-        0 0 10px rgb(214, 211, 30)
-        );
-    }
+  img {
+    filter: drop-shadow(0 0 10px rgb(214, 211, 30));
+  }
 </style>

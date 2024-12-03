@@ -1,213 +1,301 @@
 ---
-import { getCollection } from 'astro:content';
-import Layout from '../../layouts/Layout.astro';
+import Layout from "../../layouts/Layout.astro";
 
+// Definir el orden de las posiciones
 const positionOrder: Record<string, number> = {
-  'Top': 1,
-  'Jungler': 2,
-  'Mid': 3,
-  'Adc': 4,
-  'Support': 5
+  Top: 1,
+  Jungler: 2,
+  Mid: 3,
+  Adc: 4,
+  Support: 5,
 };
 
-// Obtener todos los jugadores de la colección 'players'
-const players = await getCollection('players');
+// URLs de la API
+const PLAYERS_API_URL = "https://g2historyapi.vercel.app/players";
+const YEARS_API_URL = "https://g2historyapi.vercel.app/years"; // Definido globalmente para evitar problemas
 
 // Obtener el parámetro del año seleccionado de la URL
 const { id } = Astro.params;
+const selectedYear = id || "2016.1"; // Si no hay un año, usa 2016.1 como predeterminado
 
-// Filtrar los jugadores que pertenecen al año seleccionado
-const filteredPlayers = players.filter(player => player.data.years.includes(id ? id : ''));
-
-// Si no hay año seleccionado, redirigir a 2016.1
-const selectedYear = id ? id : '2016.1';
-
-// Lista de años desde 2016 (dividido en 3) hasta 2024
-const years = [
-  '2016.1', '2016.2', '2016.3',
-  ...Array.from({ length: 2024 - 2017 + 1 }, (_, i) => (2017 + i).toString())
-];
-
-// Mapeo de años visuales para los años divididos de 2016
-const yearLabels: Record<string, string> = {
-  '2016.1': '2016 Spring',
-  '2016.2': '2016 Summer Regular',
-  '2016.3': '2016 Summer Playoffs'
-};
-
-// Función para mostrar el año de forma personalizada
-function getYearLabel(year: string) {
-  return yearLabels[year] || year;
+interface Player {
+  nickname: string;
+  name: string;
+  position: string;
+  img: string;
+  years: string[];
 }
 
-// Exportar la función getStaticPaths para generar las rutas dinámicas
-export async function getStaticPaths() {
-  const years = [
-    '2016.1', '2016.2', '2016.3',
-    ...Array.from({ length: 2024 - 2017 + 1 }, (_, i) => (2017 + i).toString())
-  ];
+let players: Player[] = [];
+let years: any[] = [];
 
-  return years.map(year => ({
-    params: { id: year },
+// Llamar a la API para obtener los años y jugadores
+try {
+  const [playersResponse, yearsResponse] = await Promise.all([
+    fetch(PLAYERS_API_URL),
+    fetch(YEARS_API_URL),
+  ]);
+
+  if (!playersResponse.ok || !yearsResponse.ok) {
+    throw new Error("Error al obtener los datos");
+  }
+
+  const playersData = await playersResponse.json();
+  years = await yearsResponse.json();
+
+  // Filtrar jugadores por el año seleccionado
+  players = playersData.filter((player: { years: string | never[] }) =>
+    player.years.includes(selectedYear)
+  );
+
+  // Ordenar los jugadores por posición
+  players.sort(
+    (a: { position: string | number }, b: { position: string | number }) => {
+      const positionA = positionOrder[a.position] || 999;
+      const positionB = positionOrder[b.position] || 999;
+      return positionA - positionB;
+    }
+  );
+} catch (error) {
+  console.error("Error al obtener los datos:", error);
+}
+// Función para obtener etiquetas legibles para los años
+function getYearLabel(year: never) {
+  const yearObj = years.find((y) => y.year_identifier === year);
+  return yearObj ? yearObj.label : year;
+}
+// Exportar las rutas dinámicas basadas en los años disponibles
+export async function getStaticPaths() {
+  const YEARS_API_URL = "https://g2historyapi.vercel.app/years"; // Definir explícitamente dentro de la función
+  const response = await fetch(YEARS_API_URL);
+
+  if (!response.ok) {
+    throw new Error("Error al obtener los años");
+  }
+
+  const yearsData = await response.json();
+
+  return yearsData.map((year: { year_identifier: any }) => ({
+    params: { id: year.year_identifier },
   }));
 }
-
-// Filtrar y ordenar los jugadores
-filteredPlayers.sort((a, b) => {
-  const positionA = positionOrder[a.data.position as keyof typeof positionOrder] || 999;
-  const positionB = positionOrder[b.data.position as keyof typeof positionOrder] || 999;
-  return positionA - positionB;
-});
 ---
 
 <Layout title="G2 Esports Playerbase">
-	<main class="flex flex-col items-center">
-	  <section aria-label="Jugadores de G2 Esports">
-		<h1 class="text-3xl font-bold text-center mb-4">{getYearLabel(selectedYear)} roster</h1>
+  <main class="flex flex-col items-center">
+    <section aria-label="Jugadores de G2 Esports">
+      <h1 class="text-3xl font-bold text-center mb-10">
+        {getYearLabel(selectedYear)} roster
+      </h1>
 
-        <!-- Selector de año para móviles -->
-        <div class="sm:hidden mb-6 flex justify-center">
-          <select id="yearSelector" class="bg-gray-700 text-white border border-gray-600 rounded-full px-4 py-2 w-64 text-center appearance-none bg-no-repeat bg-right-center">
-            {years.map(year => (
-              <option value={year} selected={year === selectedYear}>
-                {getYearLabel(year)}
-              </option>
-            ))}
-          </select>
+      <!-- Selector de año para móviles -->
+      <div class="sm:hidden mb-6 flex justify-center">
+        <select
+          id="yearSelector"
+          class="bg-gray-700 text-white border border-gray-600 rounded-full px-4 py-2 w-64 text-center appearance-none bg-no-repeat bg-right-center"
+        >
+          {
+            years.map(
+              (year: {
+                year_identifier: string | number | string[] | null | undefined;
+                label: unknown;
+              }) => (
+                <option
+                  value={year.year_identifier}
+                  selected={year.year_identifier === selectedYear}
+                >
+                  {year.label}
+                </option>
+              )
+            )
+          }
+        </select>
+      </div>
+
+      <!-- Para pantallas móviles (sm:hidden) -->
+      <div class="px-4 sm:hidden mx-auto max-w-screen-xl">
+        <div class="grid gap-6 md:grid-cols-3">
+          {
+            players.map(
+              (player: {
+                nickname: any;
+                name: any;
+                position: any;
+                img: any;
+              }) => {
+                const { nickname, name, position, img } = player;
+                const normalizedNickname = nickname.replace(/\s+/g, "-"); // Reemplaza espacios por guiones
+                return (
+                  <article class="flex">
+                    <a
+                      href={`/player/${normalizedNickname}`}
+                      class="mb-2 xl:mb-0 transition hover:scale-110"
+                    >
+                      <img
+                        transition:name={`img-${nickname}`}
+                        class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
+                        src={img}
+                        alt={name}
+                      />
+                    </a>
+
+                    <div class="flex flex-col justify-center">
+                      <h1
+                        transition:name={`nickname-${nickname}`}
+                        class="mb-2 text-4xl font-bold leading-tight text-white"
+                      >
+                        {nickname}
+                      </h1>
+                      <h2
+                        transition:name={`name-${nickname}`}
+                        class="mb-2 text-2xl font-bold leading-tight text-white"
+                      >
+                        {name}
+                      </h2>
+
+                      <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
+                    </div>
+                  </article>
+                );
+              }
+            )
+          }
+        </div>
+      </div>
+
+      <!-- Para pantallas mayores que móviles (sm:block y superiores) -->
+      <div class="px-4 hidden sm:block mx-auto max-w-screen-xl">
+        <!-- Primera fila con 3 jugadores -->
+        <div class="grid gap-6 grid-cols-3">
+          {
+            players
+              .slice(0, 3)
+              .map(
+                (player: {
+                  nickname: any;
+                  name: any;
+                  position: any;
+                  img: any;
+                }) => {
+                  const { nickname, name, position, img } = player;
+                  const normalizedNickname = nickname.replace(/\s+/g, "-"); // Reemplaza espacios por guiones
+                  return (
+                    <article class="flex">
+                      <a
+                        href={`/player/${normalizedNickname}`}
+                        class="mb-2 xl:mb-0 transition hover:scale-110"
+                      >
+                        <img
+                          transition:name={`img-${nickname}`}
+                          class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
+                          src={img}
+                          alt={name}
+                        />
+                      </a>
+
+                      <div class="flex flex-col justify-center">
+                        <h1
+                          transition:name={`nickname-${nickname}`}
+                          class="mb-2 text-4xl font-bold leading-tight text-white"
+                        >
+                          {nickname}
+                        </h1>
+                        <h2
+                          transition:name={`name-${nickname}`}
+                          class="mb-2 text-2xl font-bold leading-tight text-white"
+                        >
+                          {name}
+                        </h2>
+
+                        <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
+                      </div>
+                    </article>
+                  );
+                }
+              )
+          }
         </div>
 
-		<!-- Para pantallas móviles (sm:hidden) -->
-		<div class="px-4 sm:hidden mx-auto max-w-screen-xl">
-		  <div class="grid gap-6 md:grid-cols-3">
+        <!-- Segunda fila con 2 jugadores -->
+        <div class="flex gap-6 mt-8 justify-center">
 			{
-			  filteredPlayers.map(player => {
-				const { slug, data } = player;
-				const { nickname, name, position, img } = data;
+			  players
+				.slice(3, 5)
+				.map(
+				  (player: {
+					nickname: any;
+					name: any;
+					position: any;
+					img: any;
+				  }) => {
+					const { nickname, name, position, img } = player;
+					const normalizedNickname = nickname.replace(/\s+/g, "-"); // Reemplaza espacios por guiones
+					return (
+					  <article class="flex">
+						<a
+						  href={`/player/${normalizedNickname}`}
+						  class="mb-2 xl:mb-0 transition hover:scale-110"
+						>
+						  <img
+							transition:name={`img-${nickname}`}
+							class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
+							src={img}
+							alt={name}
+						  />
+						</a>
   
-				return (
-				  <article class="flex">
-					<a href={`/player/${slug}`} class="mb-2 xl:mb-0 transition hover:scale-110">
-					  <img
-						transition:name={`img-${slug}`}
-						class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
-						src={`/${img}`}
-						alt={name}
-					  />
-					</a>
+						<div class="flex flex-col justify-center">
+						  <h1
+							transition:name={`nickname-${nickname}`}
+							class="mb-2 text-4xl font-bold leading-tight text-white"
+						  >
+							{nickname}
+						  </h1>
+						  <h2
+							transition:name={`name-${nickname}`}
+							class="mb-2 text-2xl font-bold leading-tight text-white"
+						  >
+							{name}
+						  </h2>
   
-					<div class="flex flex-col justify-center">
-					  <h1 transition:name={`nickname-${slug}`} class="mb-2 text-4xl font-bold leading-tight text-white">
-						{nickname}
-					  </h1>
-					  <h2 transition:name={`name-${slug}`} class="mb-2 text-2xl font-bold leading-tight text-white">
-						{name}
-					  </h2>
-  
-					  <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
-					</div>
-				  </article>
-				);
-			  })
+						  <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
+						</div>
+					  </article>
+					);
+				  }
+				)
 			}
 		  </div>
-		</div>
 
-		<!-- Para pantallas mayores que móviles (sm:block y superiores) -->
-		<div class="px-4 hidden sm:block mx-auto max-w-screen-xl">
-		  <!-- Primera fila con 3 jugadores -->
-		  <div class="grid gap-6 grid-cols-3">
-			{
-			  filteredPlayers.slice(0, 3).map(player => {
-				const { slug, data } = player;
-				const { nickname, name, position, img } = data;
-  
-				return (
-				  <article class="flex">
-					<a href={`/player/${slug}`} class="mb-2 xl:mb-0 transition hover:scale-110">
-					  <img
-						transition:name={`img-${slug}`}
-						class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
-						src={`/${img}`}
-						alt={name}
-					  />
-					</a>
-  
-					<div class="flex flex-col justify-center">
-					  <h1 transition:name={`nickname-${slug}`} class="mb-2 text-4xl font-bold leading-tight text-white">
-						{nickname}
-					  </h1>
-					  <h2 transition:name={`name-${slug}`} class="mb-2 text-2xl font-bold leading-tight text-white">
-						{name}
-					  </h2>
-  
-					  <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
-					</div>
-				  </article>
-				);
-			  })
-			}
-		  </div>
-  
-		  <!-- Segunda fila con 2 jugadores -->
-		 <div class="flex gap-6 mt-8 justify-center">
-			{
-			  filteredPlayers.slice(3, 5).map(player => {
-				const { slug, data } = player;
-				const { nickname, name, position, img } = data;
-  
-				return (
-				  <article class="flex">
-					<a href={`/player/${slug}`} class="mb-2 xl:mb-0 transition hover:scale-110">
-					  <img
-						transition:name={`img-${slug}`}
-						class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
-						src={`/${img}`}
-						alt={name}
-					  />
-					</a>
-  
-					<div class="flex flex-col justify-center">
-					  <h1 transition:name={`nickname-${slug}`} class="mb-2 text-4xl font-bold leading-tight text-white">
-						{nickname}
-					  </h1>
-					  <h2 transition:name={`name-${slug}`} class="mb-2 text-2xl font-bold leading-tight text-white">
-						{name}
-					  </h2>
-  
-					  <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
-					</div>
-				  </article>
-				);
-			  })
-			}
-		  </div>
-		  <!-- Barra de años para pantallas más grandes (visible solo en pantallas grandes) -->
-		<div class="hidden sm:flex justify-center mt-24 gap-2">
-			{years.map(year => (
-			  <a href={`/year/${year}`} 
-				 class={`px-4 py-2 border rounded hover:text-white ${year === selectedYear ? 'border-yellow-500 text-yellow-500' : 'border-gray-300 text-gray-500'}`}>
-				{getYearLabel(year)}
-			  </a>
-			))}
-		  </div>
-		 </div>
-	  </section>
-	</main>
+        <!-- Barra de años para pantallas grandes -->
+        <div class="hidden sm:flex justify-center mt-24 gap-2">
+          {
+            years.map((year: { year_identifier: any; label: unknown }) => (
+              <a
+                href={`/year/${year.year_identifier}`} rel="prefetch"
+                class={`px-4 py-2 border rounded hover:text-white ${
+                  year.year_identifier === selectedYear
+                    ? "border-yellow-500 text-yellow-500"
+                    : "border-gray-300 text-gray-500"
+                }`}
+              >
+                {year.label}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+  </main>
 </Layout>
 
-<style>
-  #yearSelector {
-    background-size: 1.5rem auto;
-  }
-</style>
-
 <script>
-  import { navigate } from 'astro:transitions/client';
+  import { navigate } from "astro:transitions/client";
 
-  document.addEventListener('astro:page-load', () => {
-    const yearSelector = document.getElementById('yearSelector') as HTMLSelectElement;
+  document.addEventListener("astro:page-load", () => {
+    const yearSelector = document.getElementById("yearSelector");
     if (yearSelector) {
-      yearSelector.addEventListener('change', (event) => {
+      yearSelector.addEventListener("change", (event) => {
         const selectedYear = (event.target as HTMLSelectElement).value;
         navigate(`/year/${selectedYear}`);
       });
