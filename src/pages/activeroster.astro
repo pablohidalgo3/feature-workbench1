@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-
+import { PLAYERS_API_ENDPOINT } from "astro:env/server";
 // Definir el orden de las posiciones
 const positionOrder: Record<string, number> = {
   Top: 1,
@@ -10,9 +10,6 @@ const positionOrder: Record<string, number> = {
   Support: 5,
 };
 
-// URL de la API
-const PLAYERS_API_URL = "https://g2historyapi.vercel.app/players";
-
 // Calcular el año actual
 const currentYear = new Date().getFullYear();
 
@@ -20,7 +17,7 @@ let players = [];
 
 try {
   // Llamada a la API para obtener los jugadores
-  const response = await fetch(PLAYERS_API_URL);
+  const response = await fetch(`${PLAYERS_API_ENDPOINT}/players`);
 
   if (!response.ok) {
     throw new Error("Error al obtener los jugadores");
