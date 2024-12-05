@@ -1,23 +1,24 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import { SINGLE_PLAYER_API_ENDPOINT } from "astro:env/server";
+
+const { id } = Astro.params;
+
+const response = await fetch(`${SINGLE_PLAYER_API_ENDPOINT}/${id}`);
+
+const player = await response.json();
 
 export async function getStaticPaths() {
-  // Llamar a la API para obtener los jugadores
-  const response = await fetch("https://g2historyapi.vercel.app/players");
-  if (!response.ok) {
-    throw new Error("Error al obtener los jugadores");
-  }
+  const response = await fetch(`${SINGLE_PLAYER_API_ENDPOINT}`);
 
   const players = await response.json();
 
-  // Generar rutas dinámicas basadas en los nicknames
-  return players.map((player: { nickname: string; }) => ({
-    params: { id: player.nickname.replace(/\s+/g, '-') }, // Reemplazar espacios por guiones
+  return players.map((player: { id: any }) => ({
+    params: { id: player.id },
     props: { player },
-}));
+  }));
 }
 
-const { player } = Astro.props;
 const {
   nickname,
   name,

@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { PLAYERS_API_ENDPOINT } from "astro:env/server";
+
 // Definir el orden de las posiciones
 const positionOrder: Record<string, number> = {
   Top: 1,
@@ -15,36 +16,19 @@ const currentYear = new Date().getFullYear();
 
 let players = [];
 
-try {
-  // Llamada a la API para obtener los jugadores
-  const response = await fetch(`${PLAYERS_API_ENDPOINT}/players`);
+// Llamada a la API para obtener los jugadores
+const response = await fetch(`${PLAYERS_API_ENDPOINT}/${currentYear}`);
 
-  if (!response.ok) {
-    throw new Error("Error al obtener los jugadores");
+const currentPlayers = await response.json();
+
+// Ordenar los jugadores por posición
+players = currentPlayers.sort(
+  (a: { position: string | number }, b: { position: string | number }) => {
+    const positionA = positionOrder[a.position] || 999;
+    const positionB = positionOrder[b.position] || 999;
+    return positionA - positionB;
   }
-
-  const data = await response.json();
-
-  // Filtrar los jugadores que pertenecen al año actual
-  const filteredPlayers = data.filter((player: { years: string | string[] }) =>
-    player.years.includes(currentYear.toString())
-  );
-
-  // Ordenar los jugadores por posición
-  players = filteredPlayers.sort(
-    (a: { position: string | number }, b: { position: string | number }) => {
-      const positionA = positionOrder[a.position] || 999;
-      const positionB = positionOrder[b.position] || 999;
-      return positionA - positionB;
-    }
-  );
-} catch (error) {
-  if (error instanceof Error) {
-    console.error("Error al obtener los jugadores:", error.message);
-  } else {
-    console.error("Error al obtener los jugadores:", error);
-  }
-}
+);
 ---
 
 <Layout title="G2 Esports Playerbase">
@@ -57,17 +41,17 @@ try {
           {
             players.map(
               (player: {
+                id: any;
                 nickname: any;
                 name: any;
                 position: any;
                 img: any;
               }) => {
-                const { nickname, name, position, img } = player;
-                const normalizedNickname = nickname.replace(/\s+/g, "-"); // Reemplaza espacios por guiones
+                const { id, nickname, name, position, img } = player;
                 return (
                   <article class="flex">
                     <a
-                      href={`/player/${normalizedNickname}`}
+                      href={`/player/${id}`}
                       class="mb-2 xl:mb-0 transition hover:scale-110"
                     >
                       <img
