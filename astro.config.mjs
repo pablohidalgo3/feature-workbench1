@@ -13,7 +13,7 @@ export default defineConfig({
   env: {
     schema: {
       SINGLE_PLAYER_API_ENDPOINT: envField.string({ context: 'server', access: 'public' }),
-      PLAYERS_API_ENDPOINT: envField.string({ context: 'server', access: 'public' }),
+      YEAR_PLAYERS_API_ENDPOINT: envField.string({ context: 'server', access: 'public' }),
     }
   },
   
