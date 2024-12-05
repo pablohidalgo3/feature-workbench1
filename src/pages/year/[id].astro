@@ -1,5 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import { YEAR_PLAYERS_API_ENDPOINT } from "astro:env/server";
+import { YEARS_API_ENDPOINT } from "astro:env/server";
 
 // Definir el orden de las posiciones
 const positionOrder: Record<string, number> = {
@@ -10,55 +12,30 @@ const positionOrder: Record<string, number> = {
   Support: 5,
 };
 
-// URLs de la API
-const PLAYERS_API_URL = "https://g2historyapi.vercel.app/players";
-const YEARS_API_URL = "https://g2historyapi.vercel.app/years"; // Definido globalmente para evitar problemas
-
 // Obtener el parámetro del año seleccionado de la URL
 const { id } = Astro.params;
 const selectedYear = id || "2016.1"; // Si no hay un año, usa 2016.1 como predeterminado
 
-interface Player {
-  nickname: string;
-  name: string;
-  position: string;
-  img: string;
-  years: string[];
-}
-
-let players: Player[] = [];
+let players = [];
 let years: any[] = [];
 
-// Llamar a la API para obtener los años y jugadores
-try {
-  const [playersResponse, yearsResponse] = await Promise.all([
-    fetch(PLAYERS_API_URL),
-    fetch(YEARS_API_URL),
-  ]);
+const [playersResponse, yearsResponse] = await Promise.all([
+  fetch(`${YEAR_PLAYERS_API_ENDPOINT}/${selectedYear}`),
+  fetch(YEARS_API_ENDPOINT),
+]);
 
-  if (!playersResponse.ok || !yearsResponse.ok) {
-    throw new Error("Error al obtener los datos");
+players = await playersResponse.json();
+years = await yearsResponse.json();
+
+// Ordenar los jugadores por posición
+players.sort(
+  (a: { position: string | number }, b: { position: string | number }) => {
+    const positionA = positionOrder[a.position] || 999;
+    const positionB = positionOrder[b.position] || 999;
+    return positionA - positionB;
   }
+);
 
-  const playersData = await playersResponse.json();
-  years = await yearsResponse.json();
-
-  // Filtrar jugadores por el año seleccionado
-  players = playersData.filter((player: { years: string | never[] }) =>
-    player.years.includes(selectedYear)
-  );
-
-  // Ordenar los jugadores por posición
-  players.sort(
-    (a: { position: string | number }, b: { position: string | number }) => {
-      const positionA = positionOrder[a.position] || 999;
-      const positionB = positionOrder[b.position] || 999;
-      return positionA - positionB;
-    }
-  );
-} catch (error) {
-  console.error("Error al obtener los datos:", error);
-}
 // Función para obtener etiquetas legibles para los años
 function getYearLabel(year: never) {
   const yearObj = years.find((y) => y.year_identifier === year);
@@ -66,12 +43,7 @@ function getYearLabel(year: never) {
 }
 // Exportar las rutas dinámicas basadas en los años disponibles
 export async function getStaticPaths() {
-  const YEARS_API_URL = "https://g2historyapi.vercel.app/years"; // Definir explícitamente dentro de la función
-  const response = await fetch(YEARS_API_URL);
-
-  if (!response.ok) {
-    throw new Error("Error al obtener los años");
-  }
+  const response = await fetch(YEARS_API_ENDPOINT);
 
   const yearsData = await response.json();
 
@@ -218,54 +190,54 @@ export async function getStaticPaths() {
 
         <!-- Segunda fila con 2 jugadores -->
         <div class="flex gap-6 mt-8 justify-center">
-			{
-			  players
-				.slice(3, 5)
-				.map(
-				  (player: {
-					nickname: any;
-					name: any;
-					position: any;
-					img: any;
-				  }) => {
-					const { nickname, name, position, img } = player;
-					const normalizedNickname = nickname.replace(/\s+/g, "-"); // Reemplaza espacios por guiones
-					return (
-					  <article class="flex">
-						<a
-						  href={`/player/${normalizedNickname}`}
-						  class="mb-2 xl:mb-0 transition hover:scale-110"
-						>
-						  <img
-							transition:name={`img-${nickname}`}
-							class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
-							src={img}
-							alt={name}
-						  />
-						</a>
-  
-						<div class="flex flex-col justify-center">
-						  <h1
-							transition:name={`nickname-${nickname}`}
-							class="mb-2 text-4xl font-bold leading-tight text-white"
-						  >
-							{nickname}
-						  </h1>
-						  <h2
-							transition:name={`name-${nickname}`}
-							class="mb-2 text-2xl font-bold leading-tight text-white"
-						  >
-							{name}
-						  </h2>
-  
-						  <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
-						</div>
-					  </article>
-					);
-				  }
-				)
-			}
-		  </div>
+          {
+            players
+              .slice(3, 5)
+              .map(
+                (player: {
+                  nickname: any;
+                  name: any;
+                  position: any;
+                  img: any;
+                }) => {
+                  const { nickname, name, position, img } = player;
+                  const normalizedNickname = nickname.replace(/\s+/g, "-"); // Reemplaza espacios por guiones
+                  return (
+                    <article class="flex">
+                      <a
+                        href={`/player/${normalizedNickname}`}
+                        class="mb-2 xl:mb-0 transition hover:scale-110"
+                      >
+                        <img
+                          transition:name={`img-${nickname}`}
+                          class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
+                          src={img}
+                          alt={name}
+                        />
+                      </a>
+
+                      <div class="flex flex-col justify-center">
+                        <h1
+                          transition:name={`nickname-${nickname}`}
+                          class="mb-2 text-4xl font-bold leading-tight text-white"
+                        >
+                          {nickname}
+                        </h1>
+                        <h2
+                          transition:name={`name-${nickname}`}
+                          class="mb-2 text-2xl font-bold leading-tight text-white"
+                        >
+                          {name}
+                        </h2>
+
+                        <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
+                      </div>
+                    </article>
+                  );
+                }
+              )
+          }
+        </div>
 
         <!-- Barra de años para pantallas grandes -->
         <div class="hidden sm:flex justify-center mt-24 gap-2">
