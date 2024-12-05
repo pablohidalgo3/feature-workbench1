@@ -95,17 +95,18 @@ players = currentPlayers.sort(
               .slice(0, 3)
               .map(
                 (player: {
+                  id: any;
                   nickname: any;
                   name: any;
                   position: any;
                   img: any;
                 }) => {
-                  const { nickname, name, position, img } = player;
+                  const { id, nickname, name, position, img } = player;
                   const normalizedNickname = nickname.replace(/\s+/g, "-"); // Reemplaza espacios por guiones
                   return (
                     <article class="flex">
                       <a
-                        href={`/player/${normalizedNickname}`}
+                        href={`/player/${id}`}
                         class="mb-2 xl:mb-0 transition hover:scale-110"
                       >
                         <img
@@ -146,17 +147,17 @@ players = currentPlayers.sort(
               .slice(3, 5)
               .map(
                 (player: {
+                  id: any;
                   nickname: any;
                   name: any;
                   position: any;
                   img: any;
                 }) => {
-                  const { nickname, name, position, img } = player;
-                  const normalizedNickname = nickname.replace(/\s+/g, "-"); // Reemplaza espacios por guiones
+                  const { id, nickname, name, position, img } = player;
                   return (
                     <article class="flex">
                       <a
-                        href={`/player/${normalizedNickname}`}
+                        href={`/player/${id}`}
                         class="mb-2 xl:mb-0 transition hover:scale-110"
                       >
                         <img
