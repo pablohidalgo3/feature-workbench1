@@ -1,7 +1,5 @@
 # G2 Esports History Web Application
 
-![G2 Esports](https://your-image-link.com/banner.jpg) <!-- Opcional: Enlace a una imagen representativa -->
-
 ## Descripción
 
 Esta aplicación web es un **Hall of Fame** para **G2 Esports**, una de las organizaciones más destacadas en la industria de los esports. Desarrollada con **Astro** y otras tecnologías modernas, esta plataforma proporciona una experiencia única para explorar los logros históricos, jugadores destacados y la evolución de los rosters a lo largo de los años.
