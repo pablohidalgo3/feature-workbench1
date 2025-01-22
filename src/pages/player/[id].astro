@@ -3,16 +3,12 @@ import Layout from "../../layouts/Layout.astro";
 import { SINGLE_PLAYER_API_ENDPOINT } from "astro:env/server";
 
 const { id } = Astro.params;
-
 const response = await fetch(`${SINGLE_PLAYER_API_ENDPOINT}/${id}`);
-
 const player = await response.json();
 
 export async function getStaticPaths() {
   const response = await fetch(`${SINGLE_PLAYER_API_ENDPOINT}`);
-
   const players = await response.json();
-
   return players.map((player: { id: any }) => ({
     params: { id: player.id },
     props: { player },
@@ -31,135 +27,222 @@ const {
   trivia,
   titles,
 } = player;
+
+const formattedTitles = titles
+  ? titles.split(";").map((title: string) => title.trim())
+  : [];
+const formattedTrivia = trivia
+  ? trivia.split(";").map((item: string) => item.trim())
+  : [];
+
+const titleMap = {
+  "Rift Rivals": "🥇", // Menor importancia
+  "EU LCS": "🎖️",
+  LEC: "🏆", // Mayor importancia
+  MSI: "🌟", // Muy especial
+};
 ---
 
-<style>
-  @keyframes bounce {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-
-  .scroll-arrow {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: rgba(255, 255, 255, 0.7);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: opacity 0.3s ease;
-    animation: bounce 2s infinite;
-  }
-
-  .scroll-arrow svg {
-    width: 24px;
-    height: 24px;
-  }
-
-  @media (min-width: 768px) {
-    .scroll-arrow {
-      display: none;
-    }
-  }
-</style>
-
-<Layout title={`Player - ${nickname}`}>
-  <div
-    class="flex flex-col md:flex-row gap-12 justify-center items-center md:items-start"
-  >
-    <aside class="flex flex-col items-center gap-4 md:items-start">
-      <img
-        transition:name={`img-${nickname}`}
-        class="rounded w-48 h-auto md:w-72"
-        src={img}
-        alt={name}
-      />
-    </aside>
-
-    <main class="text-center md:text-left max-w-3xl mt-6 md:mt-0">
-      <h1
-        transition:name={`nickname-${nickname}`}
-        class="text-3xl md:text-4xl font-bold mb-4"
+<Layout title={`${nickname} - Player Profile`}>
+  <div class="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div class="container mx-auto px-4 py-2">
+      <div
+        class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8 items-start"
       >
-        {nickname}
-      </h1>
-      <h1
-        transition:name={`name-${nickname}`}
-        class="text-xl md:text-2xl font-bold mb-4"
-      >
-        {name}
-      </h1>
-      <h1 class="text-xl md:text-2xl font-bold mb-8">{position}</h1>
+        <!-- Image - Now first on mobile and medium screens -->
+        <div
+          class="lg:col-span-2 lg:col-start-2 lg:row-start-1 flex justify-center items-start order-first lg:order-none"
+        >
+          <div class="w-full max-w-md aspect-square">
+            <img
+              transition:name={`img-${nickname}`}
+              class="w-full h-full object-contain rounded-lg shadow-lg"
+              src={img || "/placeholder.svg"}
+              alt={name}
+            />
+          </div>
+        </div>
 
-      <p class="text-lg text-gray-400">Country: {country}</p>
-      <p class="text-lg text-gray-400">Team: {team}</p>
-      <p class="text-lg text-gray-400">Birthday: {birthday}</p>
-      <p class="text-lg text-gray-400">Age: {age}</p>
-      <p class="text-lg text-gray-400">
-        Trivia: {trivia || "No trivia available"}
-      </p>
-      <p class="text-lg text-gray-400">
-        Titles: {titles || "No titles available"}
-      </p>
-    </main>
-  </div>
+        <!-- Left Column - Info & Trivia -->
+        <div
+          class="lg:col-span-1 lg:row-start-1 space-y-8 p-6 bg-transparent shadow-inner rounded-lg text-center lg:text-left"
+        >
+          <!-- Player Info -->
+          <div class="space-y-6">
+            <h2
+              class="text-2xl lg:text-3xl text-muted-foreground flex items-center gap-2 whitespace-nowrap justify-center lg:justify-start"
+            >
+              <span class="font-bold text-red-500">{nickname}</span>
+              <span>-</span>
+              <span>{name}</span>
+            </h2>
+            <div class="space-y-2">
+              <div
+                class="flex items-center justify-center lg:justify-start gap-4 lg:gap-6 flex-wrap lg:flex-nowrap"
+              >
+                <div class="flex items-center gap-2 whitespace-nowrap">
+                  <svg
+                    class="w-6 h-6 flex-shrink-0 text-primary"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                  <span class="text-lg text-primary-foreground">{position}</span
+                  >
+                </div>
 
-  <div id="scroll-arrow" class="scroll-arrow opacity-0">
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        stroke-width="2"
-        d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-    </svg>
+                <div class="flex items-center gap-2 whitespace-nowrap">
+                  <svg
+                    class="w-6 h-6 flex-shrink-0 text-primary"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                    ></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  <span class="text-lg text-primary-foreground">{country}</span>
+                </div>
+
+                <div class="flex items-center gap-2 whitespace-nowrap">
+                  <svg
+                    class="w-6 h-6 flex-shrink-0 text-primary"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"
+                    ></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  <span class="text-lg text-primary-foreground">{birthday}</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trivia Section -->
+          <div class="space-y-4">
+            <div
+              class="flex items-center gap-3 justify-center lg:justify-start"
+            >
+              <svg
+                class="w-6 lg:w-7 h-6 lg:h-7 flex-shrink-0 text-primary"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <h3 class="text-xl lg:text-2xl font-semibold leading-tight">
+                Player Trivia
+              </h3>
+            </div>
+            {
+              formattedTrivia.length > 0 ? (
+                <ul class="space-y-3">
+                  {formattedTrivia.map((item: unknown) => (
+                    <li class="flex items-center gap-3 justify-center lg:justify-start">
+                      <span class="text-primary text-xl lg:text-2xl leading-none">
+                        •
+                      </span>
+                      <span class="text-base lg:text-lg text-muted-foreground leading-tight">
+                        {item}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="text-muted-foreground text-base lg:text-lg">
+                  No trivia available
+                </p>
+              )
+            }
+          </div>
+        </div>
+
+        <!-- Right Column - Achievements -->
+        <div
+          class="lg:col-span-1 lg:row-start-1 space-y-4 p-6 bg-transparent shadow-inner rounded-lg text-center lg:text-left"
+        >
+          <div class="flex items-center gap-3 justify-center lg:justify-start">
+            <svg
+              class="w-7 h-7 flex-shrink-0 text-primary"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+              <path d="M4 22h16"></path>
+              <path
+                d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"
+              ></path>
+              <path
+                d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"
+              ></path>
+              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+            </svg>
+            <h3 class="text-xl lg:text-2xl font-semibold leading-tight">
+              Achievements
+            </h3>
+          </div>
+
+          {
+            formattedTitles.length > 0 ? (
+              <ul class="space-y-3">
+                {formattedTitles.map((title: string) => (
+                  <li class="flex items-center gap-3 justify-center lg:justify-start">
+                    <span class="text-primary text-xl lg:text-2xl leading-none">
+                      {
+                        titleMap[
+                          Object.keys(titleMap).find(
+                            (key): key is keyof typeof titleMap =>
+                              title.includes(key)
+                          ) as keyof typeof titleMap
+                        ] || "🏆"
+                      }
+                    </span>
+                    <span class="text-base lg:text-lg text-muted-foreground leading-tight">
+                      {title}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p class="text-muted-foreground text-base lg:text-lg">
+                No titles available
+              </p>
+            )
+          }
+        </div>
+      </div>
+    </div>
   </div>
 </Layout>
-
-<script>
-  const scrollArrow = document.getElementById("scroll-arrow");
-  const contentSection = document.getElementById("content-section");
-
-  if (
-    scrollArrow instanceof HTMLElement &&
-    contentSection instanceof HTMLElement
-  ) {
-    function checkScroll() {
-      const contentRect = contentSection
-        ? contentSection.getBoundingClientRect()
-        : { top: 0, bottom: 0 };
-      const isContentVisible =
-        contentRect.top < window.innerHeight && contentRect.bottom >= 0;
-
-      if (scrollArrow) {
-        scrollArrow.style.opacity = isContentVisible ? "0" : "1";
-      }
-    }
-
-    window.addEventListener("scroll", checkScroll);
-    window.addEventListener("resize", checkScroll);
-
-    // Check initial position
-    checkScroll();
-
-    // Smooth scrolling when clicking the arrow
-    scrollArrow.addEventListener("click", () => {
-      contentSection.scrollIntoView({ behavior: "smooth" });
-    });
-  } else {
-    console.error("Required elements not found");
-  }
-</script>
