@@ -240,21 +240,36 @@ export async function getStaticPaths() {
         </div>
 
         <!-- Barra de años para pantallas grandes -->
-        <div class="hidden sm:flex justify-center mt-24 gap-2">
-          {
-            years.map((year: { year_identifier: any; label: unknown }) => (
-              <a
-                href={`/year/${year.year_identifier}`}
-                class={`px-4 py-2 border rounded hover:text-white ${
-                  year.year_identifier === selectedYear
-                    ? "border-yellow-500 text-yellow-500"
-                    : "border-gray-300 text-gray-500"
-                }`}
-              >
-                {year.label}
-              </a>
-            ))
-          }
+        <div class="timeline overflow-x-auto mt-10 px-4 md:px-8">
+          <div class="relative">
+            <!-- Línea continua detrás de todos los puntos -->
+            <div class="absolute top-[11px] left-0 right-0 h-0.5 bg-gray-300"></div>
+            
+            <!-- Elemento animado -->
+            <div id="animatedLine" class="absolute top-[11px] h-0.5 bg-yellow-500 transition-all duration-300 ease-in-out"></div>
+            
+            <ol id="timelineList" class="flex justify-between w-full relative m-0 p-0">
+              {years.map((year) => (
+                <li class="relative text-center flex-grow flex-basis-0 px-2">
+                  <a
+                    href={`/year/${year.year_identifier}`}
+                    class={`block transition-all duration-300 ${
+                      year.year_identifier === selectedYear ? "text-yellow-500 font-bold" : "text-gray-500"
+                    }`}
+                    data-year={year.year_identifier}
+                  >
+                    <div class="h-6 flex items-center justify-center relative">
+                      <div
+                        class={`absolute top-1/2 -translate-y-1/2 rounded-full transition-all duration-300 z-10
+                        ${year.year_identifier === selectedYear ? "bg-yellow-500 w-6 h-6" : "bg-gray-300 w-4 h-4"}`}
+                      ></div>
+                    </div>
+                    <span class="text-sm transition-all duration-300 block mt-2">{year.label}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </div>
     </section>
