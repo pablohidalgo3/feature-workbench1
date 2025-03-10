@@ -102,6 +102,7 @@ export async function getStaticPaths() {
                     <a
                       href={`/player/${id}`}
                       class="mb-2 xl:mb-0 transition hover:scale-110"
+                      aria-label={`Perfil de ${player.nickname}`}
                     >
                       <img
                         transition:name={`img-${nickname}`}
@@ -112,18 +113,18 @@ export async function getStaticPaths() {
                     </a>
 
                     <div class="flex flex-col justify-center">
-                      <h1
+                      <span
                         transition:name={`nickname-${nickname}`}
                         class="mb-2 text-4xl font-bold leading-tight text-white"
                       >
                         {nickname}
-                      </h1>
-                      <h2
+                      </span>
+                      <span
                         transition:name={`name-${nickname}`}
                         class="mb-2 text-2xl font-bold leading-tight text-white"
                       >
                         {name}
-                      </h2>
+                      </span>
 
                       <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
                     </div>
@@ -156,6 +157,7 @@ export async function getStaticPaths() {
                       <a
                         href={`/player/${id}`}
                         class="mb-2 xl:mb-0 transition hover:scale-110"
+                        aria-label={`Perfil de ${player.nickname}`}
                       >
                         <img
                           transition:name={`img-${nickname}`}
@@ -166,18 +168,18 @@ export async function getStaticPaths() {
                       </a>
 
                       <div class="flex flex-col justify-center">
-                        <h1
+                        <span
                           transition:name={`nickname-${nickname}`}
                           class="mb-2 text-4xl font-bold leading-tight text-white"
                         >
                           {nickname}
-                        </h1>
-                        <h2
+                        </span>
+                        <span
                           transition:name={`name-${nickname}`}
                           class="mb-2 text-2xl font-bold leading-tight text-white"
                         >
                           {name}
-                        </h2>
+                        </span>
 
                         <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
                       </div>
@@ -207,6 +209,7 @@ export async function getStaticPaths() {
                       <a
                         href={`/player/${id}`}
                         class="mb-2 xl:mb-0 transition hover:scale-110"
+                        aria-label={`Perfil de ${player.nickname}`}
                       >
                         <img
                           transition:name={`img-${nickname}`}
@@ -217,18 +220,18 @@ export async function getStaticPaths() {
                       </a>
 
                       <div class="flex flex-col justify-center">
-                        <h1
+                        <span
                           transition:name={`nickname-${nickname}`}
                           class="mb-2 text-4xl font-bold leading-tight text-white"
                         >
                           {nickname}
-                        </h1>
-                        <h2
+                        </span>
+                        <span
                           transition:name={`name-${nickname}`}
                           class="mb-2 text-2xl font-bold leading-tight text-white"
                         >
                           {name}
-                        </h2>
+                        </span>
 
                         <p class="mb-4 text-gray-300 max-w-sm">{position}</p>
                       </div>
@@ -257,6 +260,7 @@ export async function getStaticPaths() {
                       year.year_identifier === selectedYear ? "text-yellow-500 font-bold" : "text-gray-500"
                     }`}
                     data-year={year.year_identifier}
+                    aria-label={`Año ${year.label}`}
                   >
                     <div class="h-6 flex items-center justify-center relative">
                       <div

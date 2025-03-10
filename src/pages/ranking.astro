@@ -17,15 +17,18 @@ const response2 = await fetch(RANKING_API_ENDPOINT);
 const rankingPlayers = await response2.json();
 
 // Relacionar las respuestas de ambas APIs para obtener la imagen correcta
-const rankedPlayers = rankingPlayers.map((player: { nickname: string; }) => {
-    const normalizedNickname = player.nickname.replace(/\s+/g, "").toLowerCase();
-    const matchingPlayer = currentPlayers.find((p: { nickname: string; }) => p.nickname.replace(/\s+/g, "").toLowerCase() === normalizedNickname);
-    return {
-        ...player,
-        id: matchingPlayer ? matchingPlayer.id : "",  // Usar el ID de currentPlayers
-        nickname: matchingPlayer ? matchingPlayer.nickname : player.nickname, // Usar el nickname de currentPlayers
-        img: matchingPlayer ? matchingPlayer.img : "" // Usar la imagen de currentPlayers o vacío
-    };
+const rankedPlayers = rankingPlayers.map((player: { nickname: string }) => {
+  const normalizedNickname = player.nickname.replace(/\s+/g, "").toLowerCase();
+  const matchingPlayer = currentPlayers.find(
+    (p: { nickname: string }) =>
+      p.nickname.replace(/\s+/g, "").toLowerCase() === normalizedNickname
+  );
+  return {
+    ...player,
+    id: matchingPlayer ? matchingPlayer.id : "",
+    nickname: matchingPlayer ? matchingPlayer.nickname : player.nickname,
+    img: matchingPlayer ? matchingPlayer.img : "",
+  };
 });
 ---
 
@@ -34,61 +37,53 @@ const rankedPlayers = rankingPlayers.map((player: { nickname: string; }) => {
     <h1 class="text-3xl font-bold text-center mb-10">SoloQ Ranking</h1>
     <div class="px-4 mx-auto max-w-7xl">
       <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {rankedPlayers.map((player: { id: any; nickname: string; img: string | null | undefined; tier: string; lp: number; rank: number }, index: number) => (
-          <div 
-            class={`flex justify-center ${
-              index === 0 
-                ? 'md:col-span-6 md:col-start-4'  // Reducir más el ancho del primer jugador para igualar con los demás
-                : (index === 1 || index === 2 || index === 3 || index === 4)
-                  ? 'md:col-span-6' 
-                  : 'md:col-span-3'
-            }`}
-          >
-            <a 
-              href={`/player/${player.id}`} 
-              class="block max-w-lg w-full"
+        {
+          rankedPlayers.map((player: { id: any; nickname: string; img: string | null | undefined; tier: string; lp: number; rank: number }, index: number) => (
+            <div
+              class={`flex justify-center ${index === 0 ? "md:col-span-6 md:col-start-4" : index <= 4 ? "md:col-span-6" : "md:col-span-3"}`}
             >
-              <article 
-                class={`flex items-center p-4 rounded-lg shadow-md transition transform hover:scale-105 ${
-                  index === 0 
-                    ? "border-2 border-yellow-500 bg-yellow-100" 
-                    : index === 1
-                      ? "border-2 border-gray-400 bg-gray-400"  // Color plateado
-                      : index === 2
-                        ? "border-2 border-[#cd7f32] bg-[#f4a460]"  // Color bronce
-                        : "bg-[#f2f2f2]"
-                }`}
+              <a
+                href={`/player/${player.id}`}
+                class="block max-w-lg w-full"
+                aria-label={`Perfil de ${player.nickname}`}
               >
-                <span class="text-2xl font-bold text-gray-800 mr-4">#{player.rank}</span>
-                <img
-                  transition:name={`img-${player.nickname}`}
-                  class="mr-5 w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover object-top"
-                  src={player.img}
-                  alt={player.nickname}
-                />
-                <div class="flex flex-col justify-center items-center">
-                  <h1
-                    transition:name={`nickname-${player.nickname}`}
-                    class="mb-1 text-2xl font-bold text-gray-900"
-                  >
-                    {player.nickname}
-                  </h1>
-                  <h2 class="text-xl text-gray-700 flex items-center gap-2">
-                    <img 
-                      src={`/${player.tier.toLowerCase()}.png`} 
-                      alt={player.tier} 
-                      class="size-14" 
-                    />
-                    <div>
-                      <p>{player.tier}</p>
-                      <p>{player.lp} LP</p>
-                    </div>
-                  </h2>
-                </div>
-              </article>
-            </a>
-          </div>
-        ))}
+                <article
+                  class={`flex items-center p-4 rounded-lg shadow-md transition transform hover:scale-105 ${index === 0 ? "border-2 border-yellow-500 bg-yellow-100" : index === 1 ? "border-2 border-gray-400 bg-gray-400" : index === 2 ? "border-2 border-[#cd7f32] bg-[#f4a460]" : "bg-[#f2f2f2]"}`}
+                >
+                  <span class="text-2xl font-bold text-gray-800 mr-4">
+                    #{player.rank}
+                  </span>
+                  <img
+                    loading="lazy"
+                    transition:name={`img-${player.nickname}`}
+                    class="mr-5 w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover object-top"
+                    src={player.img}
+                    alt={`Foto de ${player.nickname}`}
+                  />
+                  <div class="flex flex-col justify-center items-center">
+                    <p
+                      transition:name={`nickname-${player.nickname}`}
+                      class="mb-1 text-2xl font-bold text-gray-900"
+                    >
+                      {player.nickname}
+                    </p>
+                    <h2 class="text-xl text-gray-700 flex items-center gap-2">
+                      <img
+                        src={`/${player.tier.toLowerCase()}.png`}
+                        alt={`Icono ${player.tier}`}
+                        class="size-14"
+                      />
+                      <div>
+                        <p>{player.tier}</p>
+                        <p>{player.lp} LP</p>
+                      </div>
+                    </h2>
+                  </div>
+                </article>
+              </a>
+            </div>
+          ))
+        }
       </div>
     </div>
   </main>

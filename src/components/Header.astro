@@ -11,6 +11,7 @@ const currentYear = new Date().getFullYear().toString();
     <a
             href="/"
             class="transition-all duration-300"
+            aria-label={'Home'}
           >
     <Logo />
     </a
@@ -26,6 +27,7 @@ const currentYear = new Date().getFullYear().toString();
           <a
             href="/"
             class="transition-all duration-300"
+            aria-label={'Home'}
             >Home</a
           >
         </li>
@@ -33,6 +35,7 @@ const currentYear = new Date().getFullYear().toString();
           <a
             href="/activeroster"
             class="transition-all duration-300"
+            aria-label={'Active Roster'}
             ><span
               class="text-white font-bold pl-1.5 pt-1.5 pb-1.5 rounded-l transition-colors"
               >Active</span
@@ -43,8 +46,8 @@ const currentYear = new Date().getFullYear().toString();
             ></a
           >
         </li>
-        <li><a href={`/year/${currentYear}`}>Former Rosters</a></li>
-        <li><a href="/ranking">Ranking</a></li>
+        <li><a href={`/year/${currentYear}`} aria-label={'Former Rosters'}>Former Rosters</a></li>
+        <li><a href="/ranking" aria-label={'Ranking'}>Ranking</a></li>
       </ul>
     </div>
   </nav>
@@ -65,17 +68,17 @@ const currentYear = new Date().getFullYear().toString();
 >
   <!-- Logo -->
   <div class="flex justify-center mb-4">
-    <a href="/" class="transition-all duration-300">
+    <a href="/" class="transition-all duration-300" aria-label={'Home'}>
       <Logo />
     </a>
   </div>
 
   <!-- Menú horizontal siempre visible -->
   <nav class="bg-gray-900 text-white rounded-full px-4 py-2 w-full flex justify-around shadow-lg">
-    <a href="/" class="text-sm hover:text-gray-300 transition-all">Home</a>
-    <a href="/activeroster" class="text-sm hover:text-gray-300 transition-all">Active Roster</a>
-    <a href={`/year/${currentYear}`} class="text-sm hover:text-gray-300 transition-all">Former Rosters</a>
-    <a href="/ranking" class="text-sm hover:text-gray-300 transition-all">Ranking</a>
+    <a href="/" class="text-sm hover:text-gray-300 transition-all" aria-label={'Home'}>Home</a>
+    <a href="/activeroster" class="text-sm hover:text-gray-300 transition-all" aria-label={'Active Roster'}>Active Roster</a>
+    <a href={`/year/${currentYear}`} class="text-sm hover:text-gray-300 transition-all" aria-label={'Former Rosters'}>Former Rosters</a>
+    <a href="/ranking" class="text-sm hover:text-gray-300 transition-all" aria-label={'Ranking'}>Ranking</a>
   </nav>
 </header>
 <div
