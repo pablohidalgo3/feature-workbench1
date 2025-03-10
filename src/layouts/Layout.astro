@@ -18,9 +18,9 @@ const { title } = Astro.props;
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<title>{title}</title>
 		<ClientRouter />
-		<script type="module" src="/src/scripts/loader.js"></script>
+		<script type="module" src="/scripts/loader.js"></script>
 		<script type="module">
-			import { initLoader } from '/src/scripts/loader.js';
+			import { initLoader } from '/scripts/loader.js';
 			initLoader();
 		</script>
 	</head>
