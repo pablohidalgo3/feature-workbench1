@@ -4,26 +4,46 @@ import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Loader from '../components/Loader.astro';
 interface Props {
-	title: string;
+  title: string;
+  description?: string;
+  image?: string;
+  url?: string;
 }
 
-const { title } = Astro.props;
+const { title, description, image, url } = Astro.props;
 ---
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<title>{title}</title>
+	  
+		<!-- SEO Meta Tags -->
+		<meta name="description" content={description || "Consulta el historial de G2 Esports y sus rankings."} />
+	  
+		<!-- Open Graph (para redes sociales) -->
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description || "Consulta el historial de G2 Esports y sus rankings."} />
+		<meta property="og:image" content={image || "/g2_logo.png"} />
+		<meta property="og:url" content={url || "https://www.g2leaguehistory.online/"} />
+		<meta property="og:type" content="website" />
+	  
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description || "Consulta el historial de G2 Esports y sus rankings."} />
+		<meta name="twitter:image" content={image || "/g2_logo.png"} />
+	  
 		<ClientRouter />
 		<script type="module" src="/scripts/loader.js"></script>
 		<script type="module">
-			import { initLoader } from '/scripts/loader.js';
-			initLoader();
+		  import { initLoader } from '/scripts/loader.js';
+		  initLoader();
 		</script>
-	</head>
+	  </head>
 	<body>
 		<Loader />
 		<Header/>

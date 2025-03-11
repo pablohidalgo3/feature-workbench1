@@ -53,7 +53,12 @@ export async function getStaticPaths() {
 }
 ---
 
-<Layout title="G2 Esports Playerbase">
+<Layout 
+  title="G2 History Playerbase" 
+  description="Consulta la base de jugadores de G2 Esports por año."
+  image="/g2_logo.png"
+  url=`https://www.g2leaguehistory.online/year/${selectedYear}`
+>
   <main class="flex flex-col items-center">
     <section aria-label="Jugadores de G2 Esports">
       <h1 class="text-3xl font-bold text-center mb-10">

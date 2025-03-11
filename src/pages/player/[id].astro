@@ -42,7 +42,12 @@ const titleMap = {
   MSI: "🌟", // Muy especial
 };
 ---
-
+<Layout 
+title={`${nickname} - Player Profile`}
+  description="Consulta el perfil de cada jugador de G2 Esports."
+  image="/g2_logo.png"
+  url=`https://www.g2leaguehistory.online/player/${id}`
+>
 <Layout title={`${nickname} - Player Profile`}>
   <div class="min-h-screen bg-gradient-to-b from-background to-muted/20">
     <div class="container mx-auto px-4 py-2">
