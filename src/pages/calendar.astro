@@ -2,34 +2,10 @@
 import Layout from "../layouts/Layout.astro";
 import { CALENDAR_API_ENDPOINT } from "astro:env/server";
 
-// SSR: traemos los próximos partidos
+// Fetch upcoming matches at build time or server-side render
 const res = await fetch(CALENDAR_API_ENDPOINT);
 const matches = await res.json();
 ---
-
-<style>
-  .match-card {
-    @apply flex flex-col md:flex-row items-center bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6 mb-6;
-  }
-  .team {
-    @apply flex flex-col items-center mx-4;
-  }
-  .team-logo {
-    @apply w-16 h-16 mb-2;
-  }
-  .vs {
-    @apply text-2xl font-bold mx-4;
-  }
-  .info {
-    @apply mt-4 md:mt-0 md:ml-6 text-gray-700 dark:text-gray-300;
-  }
-  .streams a {
-    @apply inline-block mr-2;
-  }
-  .icon {
-    @apply w-5 h-5 inline-block align-middle;
-  }
-</style>
 
 <Layout
   title="G2 History Calendar"
@@ -37,57 +13,71 @@ const matches = await res.json();
   image="/g2_logo.png"
   url="https://www.g2leaguehistory.online/calendar"
 >
-  <h1 class="text-center text-3xl font-bold mb-8">Próximos Partidos de G2 Esports</h1>
-
-  {matches.length > 0 ? (
-    <div>
-      {matches.map((match: { matchPage: string | URL | null | undefined; team1Logo: string | null | undefined; team1: unknown; team2Logo: string | null | undefined; team2: unknown; bo: unknown; date: unknown; streams: { twitch: string | URL | null | undefined; youtube: string | URL | null | undefined; }; tournament: { url: string | URL | null | undefined; name: unknown; }; }) => (
-        <div class="match-card" data-key={match.matchPage}>
-          <div class="team">
-            <img src={match.team1Logo} alt={String(match.team1)} class="team-logo" />
-            <span class="font-semibold">{match.team1}</span>
-          </div>
-
-          <div class="vs">vs</div>
-
-          <div class="team">
-            <img src={match.team2Logo} alt={String(match.team2)} class="team-logo" />
-            <span class="font-semibold">{match.team2}</span>
-          </div>
-
-          <div class="info">
-            <p><strong>Formato:</strong> {match.bo}</p>
-            <p><strong>Fecha:</strong> {match.date}</p>
-            <p class="streams">
+  <h1>Próximos Partidos de G2 Esports</h1>
+  {
+    matches.length > 0 ? (
+      <ul>
+        {matches.map((match: { matchPage: string | URL | null | undefined; team1: unknown; team2: unknown; bo: unknown; date: unknown; streams: { twitch: string | URL | null | undefined; youtube: string | URL | null | undefined; }; tournament: { url: string | URL | null | undefined; name: unknown; }; }) => (
+          <li id={String(match.matchPage)} style="margin-bottom: 1.5rem;">
+            <h2>
+              {match.team1} vs {match.team2}
+            </h2>
+            <p>
+              <strong>Formato:</strong> {match.bo}
+            </p>
+            <p>
+              <strong>Fecha:</strong> {match.date}
+            </p>
+            <p>
               <strong>Streams:</strong>
               {match.streams.twitch && (
-                <a href={match.streams.twitch} target="_blank" rel="noopener">
-                  <svg class="icon" viewBox="0 0 24 24"><!-- Twitch SVG --><path d="M..."/></svg>
+                <a
+                  href={match.streams.twitch}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {" "}
+                  Twitch{" "}
                 </a>
               )}
               {match.streams.youtube && (
-                <a href={match.streams.youtube} target="_blank" rel="noopener">
-                  <svg class="icon" viewBox="0 0 24 24"><!-- YouTube SVG --><path d="M..."/></svg>
+                <a
+                  href={match.streams.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {" "}
+                  YouTube{" "}
                 </a>
               )}
             </p>
             <p>
               <strong>Detalles:</strong>
-              <a href={match.matchPage} target="_blank" rel="noopener" class="text-blue-600 dark:text-blue-400 underline ml-1">
-                Ver partido
+              <a
+                href={match.matchPage}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {" "}
+                Ver partido{" "}
               </a>
             </p>
             <p>
               <strong>Torneo:</strong>
-              <a href={match.tournament.url} target="_blank" rel="noopener" class="text-blue-600 dark:text-blue-400 underline ml-1">
-                {match.tournament.name}
+              <a
+                href={match.tournament.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {" "}
+                {match.tournament.name}{" "}
               </a>
             </p>
-          </div>
-        </div>
-      ))}
-    </div>
-  ) : (
-    <p class="text-center text-gray-600 dark:text-gray-400">No hay próximos partidos registrados.</p>
-  )}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No hay próximos partidos registrados.</p>
+    )
+  }
 </Layout>
