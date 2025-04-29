@@ -5,39 +5,6 @@ import { CALENDAR_API_ENDPOINT } from "astro:env/server";
 // Fetch upcoming matches at build time or server-side render
 const res = await fetch(CALENDAR_API_ENDPOINT);
 const matches = await res.json();
-
-/**
- * Devuelve un string con el tiempo restante hasta dateString,
- * omitiendo las unidades que sean cero.
- */
- function getRemaining(dateString: string | number | Date) {
-  const target = new Date(dateString);
-  const now = new Date();
-  let diff = target.getTime() - now.getTime();
-  if (diff <= 0) return "0 segundos";
-  const units = [];
-
-  const w = Math.floor(diff / (1000 * 60 * 60 * 24 * 7));
-  if (w) units.push(`${w} ${w === 1 ? "semana" : "semanas"}`);
-  diff %= 1000 * 60 * 60 * 24 * 7;
-
-  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-  if (d) units.push(`${d} ${d === 1 ? "día" : "días"}`);
-  diff %= 1000 * 60 * 60 * 24;
-
-  const h = Math.floor(diff / (1000 * 60 * 60));
-  if (h) units.push(`${h} ${h === 1 ? "hora" : "horas"}`);
-  diff %= 1000 * 60 * 60;
-
-  const m = Math.floor(diff / (1000 * 60));
-  if (m) units.push(`${m} ${m === 1 ? "minuto" : "minutos"}`);
-  diff %= 1000 * 60;
-
-  const s = Math.floor(diff / 1000);
-  if (s) units.push(`${s} ${s === 1 ? "segundo" : "segundos"}`);
-
-  return units.join(" ");
-}
 ---
 
 <Layout
@@ -69,7 +36,6 @@ const matches = await res.json();
           <div class="w-full text-center space-y-2 text-gray-700 dark:text-gray-300">
             <p><strong>Format:</strong> {match.bo}</p>
             <p><strong>Date:</strong> {match.date}</p>
-            <p><strong>Remaining:</strong> {getRemaining(match.date as string | number | Date)}</p>
             <p class="flex items-center justify-center space-x-4">
               <strong>Streams:</strong>
               {match.streams.twitch && (
