@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import { CALENDAR_API_ENDPOINT } from "astro:env/server";
 
 // SSR: traemos los próximos partidos
-const res = await fetch(`${CALENDAR_API_ENDPOINT}/matches/upcoming`);
+const res = await fetch(CALENDAR_API_ENDPOINT);
 const matches = await res.json();
 ---
 
