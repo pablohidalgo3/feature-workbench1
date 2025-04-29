@@ -19,6 +19,7 @@ export default defineConfig({
       YEAR_PLAYERS_API_ENDPOINT: envField.string({ context: 'server', access: 'public' }),
       YEARS_API_ENDPOINT: envField.string({ context: 'server', access: 'public' }),
       RANKING_API_ENDPOINT: envField.string({ context: 'server', access: 'public' }),
+      CALENDAR_API_ENDPOINT: envField.string({ context: 'server', access: 'public' }),
     }
   },
 
