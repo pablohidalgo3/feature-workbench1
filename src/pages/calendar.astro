@@ -5,6 +5,20 @@ import { CALENDAR_API_ENDPOINT } from "astro:env/server";
 // Fetch upcoming matches at build time or server-side render
 const res = await fetch(CALENDAR_API_ENDPOINT);
 const matches = await res.json();
+
+// Function to format date
+function formatDate(dateString: string | number | Date) {
+  const date = new Date(dateString);
+  const options = { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  };
+  return date.toLocaleDateString('es-EU');
+}
 ---
 
 <Layout
@@ -13,64 +27,108 @@ const matches = await res.json();
   image="/g2_logo.png"
   url="https://www.g2leaguehistory.online/calendar"
 >
-<h1 class="text-3xl font-bold text-center mb-10">Upcoming matches</h1>
-  {matches.length > 0 ? (
-    <div class="grid gap-2 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-items-center">
-      {matches.map((match: { matchPage: string | URL | null | undefined; team1Logo: string | null | undefined; team1: unknown; team2Logo: string | null | undefined; team2: unknown; bo: unknown; date: unknown; streams: { twitch: string | URL | null | undefined; youtube: string | URL | null | undefined; }; tournament: { url: string | URL | null | undefined; name: unknown; }; }) => (
-        <div
-          class="w-full max-w-sm bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden flex flex-col items-center p-6"
-          data-id={match.matchPage}
-        >
-          <div class="flex items-center w-full justify-center space-x-6 mb-4">
-            <div class="flex flex-col items-center">
-              <img src={match.team1Logo} alt={String(match.team1)} class="w-16 h-16 object-contain mb-2" />
-              <span class="font-semibold text-lg">{match.team1}</span>
+  <main class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-center mb-14">Upcoming matches</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {matches.map((match: { tournament: { name: unknown; url: string | URL | null | undefined; }; bo: unknown; team1Logo: any; team1: unknown; team2Logo: any; team2: unknown; date: unknown; streams: { twitch: string | URL | null | undefined; youtube: string | URL | null | undefined; }; }) => (
+        <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+              <div class="text-sm font-semibold text-gray-400">{match.tournament.name}</div>
+              <div class="text-xs bg-gray-700 rounded-full px-3 py-1">{match.bo}</div>
             </div>
-            <span class="text-2xl font-bold">vs</span>
-            <div class="flex flex-col items-center">
-              <img src={match.team2Logo} alt={String(match.team2)} class="w-16 h-16 object-contain mb-2" />
-              <span class="font-semibold text-lg">{match.team2}</span>
+            
+            <div class="flex justify-between items-center mb-6">
+              <div class="flex flex-col items-center w-2/5">
+                <img 
+                  src={match.team1Logo || "/placeholder.svg"} 
+                  alt={String(match.team1)} 
+                  class="w-16 h-16 object-contain mb-2"
+                />
+                <span class="font-bold text-xl">{match.team1}</span>
+              </div>
+              
+              <div class="text-center">
+                <span class="text-xl font-bold text-gray-400">VS</span>
+              </div>
+              
+              <div class="flex flex-col items-center w-2/5">
+                <img 
+                  src={match.team2Logo || "/placeholder.svg"} 
+                  alt={String(match.team2)} 
+                  class="w-16 h-16 object-contain mb-2"
+                />
+                <span class="font-bold text-xl">{match.team2}</span>
+              </div>
             </div>
-          </div>
-
-          <div class="w-full text-center space-y-2 text-gray-700 dark:text-gray-300">
-            <p><strong>Format:</strong> {match.bo}</p>
-            <p><strong>Date:</strong> {match.date}</p>
-            <p class="flex items-center justify-center space-x-4">
-              <strong>Streams:</strong>
-              {match.streams.twitch && (
-                <a href={match.streams.twitch} target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5">
-                    <path d="M4.5 2L2 6v14h6v4l4-4h5l5-5V2H4.5z" fill="currentColor" />
-                  </svg>
-                  <span>Twitch</span>
+            
+            <div class="border-t border-gray-700 pt-4">
+              <div class="text-sm text-gray-400 mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                {match.date}
+              </div>
+              
+              <div class="flex space-x-2">
+                {match.streams.twitch && (
+                  <a 
+                    href={match.streams.twitch} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="bg-purple-700 hover:bg-purple-600 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors duration-300"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+                    </svg>
+                    Twitch
+                  </a>
+                )}
+                
+                {match.streams.youtube && (
+                  <a 
+                    href={match.streams.youtube} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    class="bg-red-700 hover:bg-red-600 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors duration-300"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                    YouTube
+                  </a>
+                )}
+              </div>
+              
+              {match.tournament.url && (
+                <a 
+                  href={match.tournament.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  class="block mt-3 text-xs text-gray-400 hover:text-white transition-colors duration-300"
+                >
+                  View tournament details →
                 </a>
               )}
-              {match.streams.youtube && (
-                <a href={match.streams.youtube} target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5">
-                    <path d="M10 15l5.19-3L10 9v6zm12-3c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v5z" fill="currentColor" />
-                  </svg>
-                  <span>YouTube</span>
-                </a>
-              )}
-            </p>
-            <p>
-              <strong>Tournament:</strong>
-              <a
-                href={match.tournament.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-blue-600 dark:text-blue-400 ml-1"
-              >
-                {match.tournament.name}
-              </a>
-            </p>
+            </div>
           </div>
         </div>
       ))}
     </div>
-  ) : (
-    <p class="text-center text-gray-600 dark:text-gray-400">No hay próximos partidos registrados.</p>
-  )}
+    
+    {matches.length === 0 && (
+      <div class="text-center py-10">
+        <p class="text-xl text-gray-400">No upcoming matches scheduled at the moment.</p>
+        <p class="mt-2">Check back later for updates.</p>
+      </div>
+    )}
+  </main>
 </Layout>
+
+<style>
+  /* Additional custom styles if needed */
+  main {
+    min-height: 70vh;
+  }
+</style>
