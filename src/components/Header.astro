@@ -8,14 +8,9 @@ const currentYear = new Date().getFullYear().toString();
   class="mt-5 px-10 hidden md:flex items-center top-0 w-full justify-between z-40 mb-10"
 >
   <div class="flex flex-grow basis-0">
-    <a
-            href="/"
-            class="transition-all duration-300"
-            aria-label={'Home'}
-          >
-    <Logo />
-    </a
-          >
+    <a href="/" class="transition-all duration-300" aria-label={"Home"}>
+      <Logo />
+    </a>
   </div>
 
   <nav class="hidden md:flex space-x-4">
@@ -24,10 +19,7 @@ const currentYear = new Date().getFullYear().toString();
         class="flex text-sm [&>li>a]:font-medium [&>li>a]:inline-block [&>li>a]:px-4 [&>li>a]:py-2 [&>li>a]:transition-colors [&>li>a]:duration-300"
       >
         <li>
-          <a
-            href="/"
-            class="transition-all duration-300"
-            aria-label={'Home'}
+          <a href="/" class="transition-all duration-300" aria-label={"Home"}
             >Home</a
           >
         </li>
@@ -35,7 +27,7 @@ const currentYear = new Date().getFullYear().toString();
           <a
             href="/activeroster"
             class="transition-all duration-300"
-            aria-label={'Active Roster'}
+            aria-label={"Active Roster"}
             ><span
               class="text-white font-bold pl-1.5 pt-1.5 pb-1.5 rounded-l transition-colors"
               >Active</span
@@ -46,9 +38,13 @@ const currentYear = new Date().getFullYear().toString();
             ></a
           >
         </li>
-        <li><a href={`/year/${currentYear}`} aria-label={'Former Rosters'}>Former Rosters</a></li>
-        <li><a href="/ranking" aria-label={'Ranking'}>Ranking</a></li>
-        <li><a href="/calendar" aria-label={'Calendar'}>Calendar</a></li>
+        <li>
+          <a href={`/year/${currentYear}`} aria-label={"Former Rosters"}
+            >Former Rosters</a>
+        </li>
+        <li><a href="/ranking" aria-label={"Ranking"}>Ranking</a></li>
+        <li><a href="/calendar" aria-label={"Calendar"}>Calendar</a></li>
+        <li><a href="/" aria-label={"About"}>About WIP</a></li>
       </ul>
     </div>
   </nav>
@@ -69,30 +65,59 @@ const currentYear = new Date().getFullYear().toString();
 >
   <!-- Logo -->
   <div class="flex justify-center mb-4">
-    <a href="/" class="transition-all duration-300" aria-label={'Home'}>
+    <a href="/" class="transition-all duration-300" aria-label={"Home"}>
       <Logo />
     </a>
   </div>
 
-  <!-- Menú horizontal siempre visible -->
-  <nav class="bg-gray-900 text-white rounded-full px-4 py-2 w-full flex justify-around shadow-lg">
-    <a href="/" class="text-sm hover:text-gray-300 transition-all" aria-label={'Home'}>Home</a>
-    <a href="/activeroster" class="text-sm hover:text-gray-300 transition-all" aria-label={'Active Roster'}>Active Roster</a>
-    <a href={`/year/${currentYear}`} class="text-sm hover:text-gray-300 transition-all" aria-label={'Former Rosters'}>Former Rosters</a>
-    <a href="/ranking" class="text-sm hover:text-gray-300 transition-all" aria-label={'Ranking'}>Ranking</a>
-    <a href="/calendar" class="text-sm hover:text-gray-300 transition-all" aria-label={'Calendar'}>Calendar</a>
+  <!-- Menú horizontal siempre visible, con wrap a dos filas si hace falta -->
+  <nav
+    class="bg-gray-900 text-white rounded-full px-4 py-2 w-full flex flex-wrap justify-around gap-y-2 shadow-lg"
+  >
+    <a
+      href="/"
+      class="w-1/3 text-center text-sm hover:text-gray-300 transition-all"
+      >Home</a
+    >
+    <a
+      href="/activeroster"
+      class="w-1/3 text-center text-sm hover:text-gray-300 transition-all"
+      >Active Roster</a
+    >
+    <a
+      href={`/year/${currentYear}`}
+      class="w-1/3 text-center text-sm hover:text-gray-300 transition-all"
+      >Former Rosters</a
+    >
+    <a
+      href="/ranking"
+      class="w-1/3 text-center text-sm hover:text-gray-300 transition-all"
+      >Ranking</a
+    >
+    <a
+      href="/calendar"
+      class="w-1/3 text-center text-sm hover:text-gray-300 transition-all"
+      >Calendar</a
+    >
+    <a
+      href="/"
+      class="w-1/3 text-center text-sm hover:text-gray-300 transition-all"
+      >About WIP</a
+    >
   </nav>
 </header>
 <div
-    id="menu-backdrop"
-    class="absolute bg-white/20 backdrop-blur-lg rounded translate-x-[var(--left)] translate-y-[var(--top)] left-0 top-0 w-[var(--width)] h-[var(--height)] transition-all duration-300 ease-in-out opacity-0 -z-10"
-  >
-  </div>
+  id="menu-backdrop"
+  class="absolute bg-white/20 backdrop-blur-lg rounded translate-x-[var(--left)] translate-y-[var(--top)] left-0 top-0 w-[var(--width)] h-[var(--height)] transition-all duration-300 ease-in-out opacity-0 -z-10"
+>
+</div>
 
 <script>
   function setupMenuBackdrop() {
     const listItem = document.querySelectorAll("#landing-header li");
-    const menuBackdrop = document.querySelector("#menu-backdrop") as HTMLElement | null;
+    const menuBackdrop = document.querySelector(
+      "#menu-backdrop"
+    ) as HTMLElement | null;
 
     if (menuBackdrop) {
       listItem.forEach((item) => {
@@ -116,7 +141,9 @@ const currentYear = new Date().getFullYear().toString();
   }
 
   function setupHeaderObserver() {
-    const header = document.querySelector("#landing-header") as HTMLElement | null;
+    const header = document.querySelector(
+      "#landing-header"
+    ) as HTMLElement | null;
     if (header) {
       const observerOptions = {
         root: null,
