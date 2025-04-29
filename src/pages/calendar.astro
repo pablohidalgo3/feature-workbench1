@@ -13,41 +13,45 @@ const matches = await res.json();
   image="/g2_logo.png"
   url="https://www.g2leaguehistory.online/calendar"
 >
-  <h1>Próximos Partidos de G2 Esports</h1>
-  {
-    matches.length > 0 ? (
-      <ul>
-        {matches.map((match: { matchPage: string | URL | null | undefined; team1: unknown; team2: unknown; bo: unknown; date: unknown; streams: { twitch: string | URL | null | undefined; youtube: string | URL | null | undefined; }; tournament: { url: string | URL | null | undefined; name: unknown; }; }) => (
-          <li id={String(match.matchPage)} style="margin-bottom: 1.5rem;">
-            <h2>
-              {match.team1} vs {match.team2}
-            </h2>
-            <p>
-              <strong>Formato:</strong> {match.bo}
-            </p>
-            <p>
-              <strong>Fecha:</strong> {match.date}
-            </p>
-            <p>
+  <h1 class="text-4xl font-bold text-center mb-8">Próximos Partidos de G2 Esports</h1>
+  {matches.length > 0 ? (
+    <div class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 justify-items-center">
+      {matches.map((match: { matchPage: string | URL | null | undefined; team1Logo: string | null | undefined; team1: unknown; team2Logo: string | null | undefined; team2: unknown; bo: unknown; date: unknown; streams: { twitch: string | URL | null | undefined; youtube: string | URL | null | undefined; }; tournament: { url: string | URL | null | undefined; name: unknown; }; }) => (
+        <div
+          class="w-full max-w-sm bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden flex flex-col items-center p-6"
+          data-id={match.matchPage}
+        >
+          <div class="flex items-center w-full justify-center space-x-6 mb-4">
+            <div class="flex flex-col items-center">
+              <img src={match.team1Logo} alt={String(match.team1)} class="w-16 h-16 object-contain mb-2" />
+              <span class="font-semibold text-lg">{match.team1}</span>
+            </div>
+            <span class="text-2xl font-bold">vs</span>
+            <div class="flex flex-col items-center">
+              <img src={match.team2Logo} alt={String(match.team2)} class="w-16 h-16 object-contain mb-2" />
+              <span class="font-semibold text-lg">{match.team2}</span>
+            </div>
+          </div>
+
+          <div class="w-full text-center space-y-2 text-gray-700 dark:text-gray-300">
+            <p><strong>Formato:</strong> {match.bo}</p>
+            <p><strong>Fecha:</strong> {match.date}</p>
+            <p class="flex items-center justify-center space-x-4">
               <strong>Streams:</strong>
               {match.streams.twitch && (
-                <a
-                  href={match.streams.twitch}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {" "}
-                  Twitch{" "}
+                <a href={match.streams.twitch} target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5">
+                    <path d="M4.5 2L2 6v14h6v4l4-4h5l5-5V2H4.5z" fill="currentColor" />
+                  </svg>
+                  <span>Twitch</span>
                 </a>
               )}
               {match.streams.youtube && (
-                <a
-                  href={match.streams.youtube}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {" "}
-                  YouTube{" "}
+                <a href={match.streams.youtube} target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-5 h-5">
+                    <path d="M10 15l5.19-3L10 9v6zm12-3c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2h16c1.1 0 2 .9 2 2v5z" fill="currentColor" />
+                  </svg>
+                  <span>YouTube</span>
                 </a>
               )}
             </p>
@@ -57,9 +61,9 @@ const matches = await res.json();
                 href={match.matchPage}
                 target="_blank"
                 rel="noopener noreferrer"
+                class="text-blue-600 dark:text-blue-400 underline ml-1"
               >
-                {" "}
-                Ver partido{" "}
+                Ver partido
               </a>
             </p>
             <p>
@@ -68,16 +72,16 @@ const matches = await res.json();
                 href={match.tournament.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                class="text-blue-600 dark:text-blue-400 underline ml-1"
               >
-                {" "}
-                {match.tournament.name}{" "}
+                {match.tournament.name}
               </a>
             </p>
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p>No hay próximos partidos registrados.</p>
-    )
-  }
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p class="text-center text-gray-600 dark:text-gray-400">No hay próximos partidos registrados.</p>
+  )}
 </Layout>
