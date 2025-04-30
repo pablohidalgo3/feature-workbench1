@@ -2,9 +2,67 @@
 import Layout from "../layouts/Layout.astro";
 import { CALENDAR_API_ENDPOINT } from "astro:env/server";
 
-// Fetch upcoming matches at build time or server-side render
 const res = await fetch(CALENDAR_API_ENDPOINT);
 const matches = await res.json();
+
+// toDataURL como lo tenías…
+async function toDataURL(url: RequestInfo | URL) {
+  if (!url) return null;
+  const imageRes = await fetch(url);
+  if (!imageRes.ok) return null;
+  const contentType = imageRes.headers.get("content-type") || "image/png";
+  const arrayBuffer = await imageRes.arrayBuffer();
+  const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+  return `data:${contentType};base64,${base64}`;
+}
+
+const matchesWithData = await Promise.all(
+  matches.map(async (match: { team1Logo: any; team2Logo: any; }) => ({
+    ...match,
+    team1Logo: await toDataURL(match.team1Logo),
+    team2Logo: await toDataURL(match.team2Logo),
+  }))
+);
+
+// 1) Formatter para la parte de fecha (May 4, 2025)
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone: "Europe/Madrid",
+  month: "long",
+  day:   "numeric",
+  year:  "numeric",
+});
+
+// 2) Formatter para hora + abreviatura de zona (19:00 CEST / CET)
+const timeFormatter = new Intl.DateTimeFormat("en-US", {
+  timeZone:     "Europe/Madrid",
+  hour:         "2-digit",
+  minute:       "2-digit",
+  hour12:       false,
+  timeZoneName: "short",
+});
+
+// 3) Reconversión final
+const localizedMatches = matchesWithData.map(match => {
+  // "May 4, 2025 - 17:00 UTC+0" → “May 4, 2025 17:00 UTC”
+  const raw = String(match.date)
+    .replace(" - ", " ")
+    .replace(/UTC.*$/, "UTC");
+  const d = new Date(raw);
+  if (isNaN(d.getTime())) return match;
+
+  const datePart = dateFormatter.format(d);           // e.g. "May 4, 2025"
+  let timePart = timeFormatter.format(d);           // e.g. "19:00 CEST"
+
+   // Sustituimos "GMT+2" → "CEST" y "GMT+1" → "CET"
+   timePart = timePart
+    .replace("GMT+2", "CEST")
+    .replace("GMT+1", "CET");
+
+  return {
+    ...match,
+    date: `${datePart} - ${timePart}`,
+  };
+});
 ---
 
 <Layout
@@ -17,7 +75,7 @@ const matches = await res.json();
     <h1 class="text-3xl font-bold text-center mb-14">Upcoming matches</h1>
     
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {matches.map((match: { tournament: { name: unknown; url: string | URL | null | undefined; }; bo: unknown; team1Logo: any; team1: unknown; team2Logo: any; team2: unknown; date: unknown; streams: { twitch: string | URL | null | undefined; youtube: string | URL | null | undefined; }; }) => (
+      {localizedMatches.map((match: { tournament: { name: unknown; url: string | URL | null | undefined; }; bo: unknown; team1Logo: any; team1: unknown; team2Logo: any; team2: unknown; date: unknown; streams: { twitch: string | URL | null | undefined; youtube: string | URL | null | undefined; }; }) => (
         <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
           <div class="p-6">
             <div class="flex justify-between items-center mb-4">
@@ -51,7 +109,7 @@ const matches = await res.json();
             
             <div class="border-t border-gray-700 pt-4">
               <div class="text-sm text-gray-400 mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mb-1 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 {match.date}
