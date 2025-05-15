@@ -19,8 +19,8 @@ async function toDataURL(url: RequestInfo | URL) {
 const matchesWithData = await Promise.all(
   matches.map(async (match: { team1Logo: any; team2Logo: any }) => ({
     ...match,
-    team1Logo: await toDataURL(match.team1Logo),
-    team2Logo: await toDataURL(match.team2Logo),
+    team1Logo: await toDataURL(match.team1Logo.replace(/\d+px/, '100px')),
+    team2Logo: await toDataURL(match.team2Logo.replace(/\d+px/, '100px')),
   }))
 );
 
