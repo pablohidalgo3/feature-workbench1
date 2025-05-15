@@ -90,7 +90,7 @@ const localizedMatches = matchesWithData
     <h1 class="text-3xl font-bold text-center mb-14">Upcoming matches</h1>
 
     <div class="grid gap-6 place-content-center"
-     style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); margin-inline: auto;">
+     style="grid-template-columns: repeat(auto-fit, minmax(320px, 800px)); margin-inline: auto;">
 
       {
         localizedMatches.map(
@@ -124,7 +124,7 @@ const localizedMatches = matchesWithData
                     <img
                       src={match.team1Logo || "/placeholder.svg"}
                       alt={String(match.team1)}
-                      class="w-16 h-16 object-contain mb-2"
+                      class="size-16 object-contain mb-2"
                     />
                     <span class="font-bold text-xl">{match.team1}</span>
                   </div>
@@ -137,7 +137,7 @@ const localizedMatches = matchesWithData
                     <img
                       src={match.team2Logo || "/placeholder.svg"}
                       alt={String(match.team2)}
-                      class="w-16 h-16 object-contain mb-2"
+                      class="size-16 object-contain mb-2"
                     />
                     <span class="font-bold text-xl">{match.team2}</span>
                   </div>

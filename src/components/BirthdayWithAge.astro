@@ -1,0 +1,32 @@
+---
+
+// Recibimos la fecha de cumpleaños en formato "YYYY-MM-DD"
+const { birthday } = Astro.props;
+
+/** 
+ * Calcula la edad completa a partir de una fecha de nacimiento 
+ * @param {string} birthDateString — Fecha en formato ISO "YYYY-MM-DD"
+ * @returns {number} Edad en años cumplidos
+ */
+function calculateAge(birthDateString: string | number | Date) {
+  const birthDate = new Date(birthDateString);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  const d = today.getDate() - birthDate.getDate();
+
+  // Si no ha llegado al cumpleaños este año, restamos 1
+  if (m < 0 || (m === 0 && d < 0)) {
+    age--;
+  }
+
+  return age;
+}
+
+// Calculamos la edad
+const age = calculateAge(birthday);
+---
+
+<span class="text-lg text-primary-foreground">
+  {birthday} ({age})
+</span>

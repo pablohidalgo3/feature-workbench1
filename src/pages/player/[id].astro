@@ -1,6 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { SINGLE_PLAYER_API_ENDPOINT } from "astro:env/server";
+import BirthdayWithAge from '../../components/BirthdayWithAge.astro';
 
 const { id } = Astro.params;
 const response = await fetch(`${SINGLE_PLAYER_API_ENDPOINT}/${id}`);
@@ -20,8 +21,6 @@ const {
   name,
   country,
   birthday,
-  age,
-  team,
   position,
   img,
   trivia,
@@ -136,8 +135,7 @@ title={`${nickname} - Player Profile`}
                     <line x1="8" y1="2" x2="8" y2="6"></line>
                     <line x1="3" y1="10" x2="21" y2="10"></line>
                   </svg>
-                  <span class="text-lg text-primary-foreground">{birthday}</span
-                  >
+                  <BirthdayWithAge birthday={birthday} />
                 </div>
               </div>
             </div>
@@ -170,11 +168,8 @@ title={`${nickname} - Player Profile`}
                 <ul class="space-y-3">
                   {formattedTrivia.map((item: unknown) => (
                     <li class="flex items-center gap-3 justify-center lg:justify-start">
-                      <span class="text-primary text-xl lg:text-2xl leading-none">
-                        •
-                      </span>
                       <span class="text-base lg:text-lg text-muted-foreground leading-tight">
-                        {item}
+                        - {item}
                       </span>
                     </li>
                   ))}
