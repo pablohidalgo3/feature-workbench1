@@ -17,7 +17,7 @@ async function toDataURL(url: RequestInfo | URL) {
 }
 
 const matchesWithData = await Promise.all(
-  matches.map(async (match: { team1Logo: any; team2Logo: any }) => ({
+  matches.map(async (match: { id: string; team1Logo: any; team2Logo: any }) => ({
     ...match,
     team1Logo: await toDataURL(match.team1Logo.replace(/\d+px/, "100px")),
     team2Logo: await toDataURL(match.team2Logo.replace(/\d+px/, "100px")),
@@ -79,81 +79,6 @@ const localizedMatches = matchesWithData
     };
   })
   .filter(Boolean); // elimina partidos que sean null (anteriores al día actual)
-
-function generateGoogleCalendarUrl(match: {
-  team1: string;
-  team2: string;
-  tournament: { name: string };
-  bo: string;
-  dateISO: string;
-  streams: { twitch?: string | URL | null; youtube?: string | URL | null };
-}) {
-  const startDate = new Date(match.dateISO);
-  const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1h
-
-  const formatDate = (d: Date) =>
-    d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-
-  const startStr = formatDate(startDate);
-  const endStr = formatDate(endDate);
-
-  const title = `G2 vs ${match.team2} (${match.tournament.name})`;
-  const details = `Best of ${match.bo}. Watch live on ${match.streams.twitch || match.streams.youtube || "Twitch/YouTube"}`;
-  const location = "Online";
-
-  return `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startStr}/${endStr}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}&sf=true&output=xml`;
-}
-
-function generateICS(match: {
-  team1: string;
-  team2: string;
-  tournament: { name: string };
-  bo: string;
-  dateISO: string;
-  streams: {
-    twitch?: string | URL | null;
-    youtube?: string | URL | null;
-  };
-  id?: string;
-}) {
-  const startDate = new Date(match.dateISO);
-  const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
-
-  const formatICSDate = (date: Date) =>
-    date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-
-  const uid =
-    match.id || `${match.team1}-${match.team2}-${formatICSDate(startDate)}`;
-
-  const summary = `G2 vs ${match.team2} (${match.tournament.name})`;
-  const description = `Best of ${match.bo}. Watch live on: ${(
-    match.streams.twitch ||
-    match.streams.youtube ||
-    "Twitch/YouTube"
-  ).toString()}`;
-  const location = "Online";
-
-  return `
-BEGIN:VCALENDAR
-VERSION:2.0
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-PRODID:-//G2 Esports//Match Calendar//EN
-BEGIN:VEVENT
-UID:${uid}
-SUMMARY:${summary}
-DTSTAMP:${formatICSDate(new Date())}
-DTSTART:${formatICSDate(startDate)}
-DTEND:${formatICSDate(endDate)}
-DESCRIPTION:${description}
-LOCATION:${location}
-STATUS:CONFIRMED
-SEQUENCE:0
-TRANSP:OPAQUE
-END:VEVENT
-END:VCALENDAR`.trim();
-}
-
 ---
 
 <Layout
@@ -171,21 +96,27 @@ END:VCALENDAR`.trim();
     >
       {
         localizedMatches.map(
-          (match: {
-            tournament: { name: string; url: string | URL | null | undefined };
-            bo: string;
-            team1Logo: any;
-            team1: string;
-            team2Logo: any;
-            team2: string;
-            date: string;
-            dateISO: string;
-            status?: "LIVE" | "FINALIZED" | null;
-            streams: {
-              twitch?: string | URL | null;
-              youtube?: string | URL | null;
-            };
-          }) => (
+          (
+            match: {
+              id: string;
+              tournament: {
+                name: string;
+                url: string | URL | null | undefined;
+              };
+              bo: string;
+              team1Logo: any;
+              team1: string;
+              team2Logo: any;
+              team2: string;
+              date: string;
+              dateISO: string;
+              status?: "LIVE" | "FINALIZED" | null;
+              streams: {
+                twitch?: string | URL | null;
+                youtube?: string | URL | null;
+              };
+            }
+          ) => (
             <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
               <div class="p-6">
                 <div class="flex justify-between items-center mb-4">
@@ -282,20 +213,10 @@ END:VCALENDAR`.trim();
                     </div>
 
                     <a
-                      href={generateGoogleCalendarUrl(match)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors duration-300"
-                    >
-                      📅 Add to Google Calendar
-                    </a>
-
-                    <a
-                      href={`data:text/calendar;charset=utf-8,${encodeURIComponent(generateICS(match))}`}
-                      download={`g2_vs_${match.team2}.ics`}
+                      href={`https://g2historyapi-production.up.railway.app/calendar/${match.id}`}
                       class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors duration-300"
                     >
-                      📥 Download .ics
+                      📥 Add to Calendar
                     </a>
                   </div>
 
