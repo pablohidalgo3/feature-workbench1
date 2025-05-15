@@ -19,8 +19,8 @@ async function toDataURL(url: RequestInfo | URL) {
 const matchesWithData = await Promise.all(
   matches.map(async (match: { team1Logo: any; team2Logo: any }) => ({
     ...match,
-    team1Logo: await toDataURL(match.team1Logo.replace(/\d+px/, '100px')),
-    team2Logo: await toDataURL(match.team2Logo.replace(/\d+px/, '100px')),
+    team1Logo: await toDataURL(match.team1Logo.replace(/\d+px/, "100px")),
+    team2Logo: await toDataURL(match.team2Logo.replace(/\d+px/, "100px")),
   }))
 );
 
@@ -74,10 +74,86 @@ const localizedMatches = matchesWithData
     return {
       ...match,
       date: `${datePart} - ${timePart}`,
+      dateISO: d.toISOString(), // guarda la fecha en formato ISO válido
       status,
     };
   })
   .filter(Boolean); // elimina partidos que sean null (anteriores al día actual)
+
+function generateGoogleCalendarUrl(match: {
+  team1: string;
+  team2: string;
+  tournament: { name: string };
+  bo: string;
+  dateISO: string;
+  streams: { twitch?: string | URL | null; youtube?: string | URL | null };
+}) {
+  const startDate = new Date(match.dateISO);
+  const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1h
+
+  const formatDate = (d: Date) =>
+    d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+  const startStr = formatDate(startDate);
+  const endStr = formatDate(endDate);
+
+  const title = `G2 vs ${match.team2} (${match.tournament.name})`;
+  const details = `Best of ${match.bo}. Watch live on ${match.streams.twitch || match.streams.youtube || "Twitch/YouTube"}`;
+  const location = "Online";
+
+  return `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startStr}/${endStr}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}&sf=true&output=xml`;
+}
+
+function generateICS(match: {
+  team1: string;
+  team2: string;
+  tournament: { name: string };
+  bo: string;
+  dateISO: string;
+  streams: {
+    twitch?: string | URL | null;
+    youtube?: string | URL | null;
+  };
+  id?: string;
+}) {
+  const startDate = new Date(match.dateISO);
+  const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+
+  const formatICSDate = (date: Date) =>
+    date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+  const uid =
+    match.id || `${match.team1}-${match.team2}-${formatICSDate(startDate)}`;
+
+  const summary = `G2 vs ${match.team2} (${match.tournament.name})`;
+  const description = `Best of ${match.bo}. Watch live on: ${(
+    match.streams.twitch ||
+    match.streams.youtube ||
+    "Twitch/YouTube"
+  ).toString()}`;
+  const location = "Online";
+
+  return `
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+PRODID:-//G2 Esports//Match Calendar//EN
+BEGIN:VEVENT
+UID:${uid}
+SUMMARY:${summary}
+DTSTAMP:${formatICSDate(new Date())}
+DTSTART:${formatICSDate(startDate)}
+DTEND:${formatICSDate(endDate)}
+DESCRIPTION:${description}
+LOCATION:${location}
+STATUS:CONFIRMED
+SEQUENCE:0
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR`.trim();
+}
+
 ---
 
 <Layout
@@ -89,23 +165,25 @@ const localizedMatches = matchesWithData
   <main class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-center mb-14">Upcoming matches</h1>
 
-    <div class="grid gap-6 place-content-center"
-     style="grid-template-columns: repeat(auto-fit, minmax(320px, 800px)); margin-inline: auto;">
-
+    <div
+      class="grid gap-6 place-content-center"
+      style="grid-template-columns: repeat(auto-fit, minmax(320px, 800px)); margin-inline: auto;"
+    >
       {
         localizedMatches.map(
           (match: {
-            tournament: { name: unknown; url: string | URL | null | undefined };
-            bo: unknown;
+            tournament: { name: string; url: string | URL | null | undefined };
+            bo: string;
             team1Logo: any;
-            team1: unknown;
+            team1: string;
             team2Logo: any;
-            team2: unknown;
-            date: unknown;
+            team2: string;
+            date: string;
+            dateISO: string;
             status?: "LIVE" | "FINALIZED" | null;
             streams: {
-              twitch: string | URL | null | undefined;
-              youtube: string | URL | null | undefined;
+              twitch?: string | URL | null;
+              youtube?: string | URL | null;
             };
           }) => (
             <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
@@ -115,7 +193,7 @@ const localizedMatches = matchesWithData
                     {match.tournament.name}
                   </div>
                   <div class="text-xs bg-gray-700 rounded-full px-3 py-1">
-                    {match.bo}
+                    {match.bo.toUpperCase()}
                   </div>
                 </div>
 
@@ -162,44 +240,63 @@ const localizedMatches = matchesWithData
                     {match.date}
                   </div>
 
-                  <div class="flex space-x-2">
-                    {match.streams.twitch && (
-                      <a
-                        href={match.streams.twitch}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="bg-purple-700 hover:bg-purple-600 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors duration-300"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-4 w-4 inline mr-1"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
+                  <div class="flex justify-between items-center flex-wrap gap-2 mt-3">
+                    <div class="flex flex-wrap gap-2">
+                      {match.streams.twitch && (
+                        <a
+                          href={match.streams.twitch}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="bg-purple-700 hover:bg-purple-600 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors duration-300"
                         >
-                          <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" />
-                        </svg>
-                        Twitch
-                      </a>
-                    )}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 inline mr-1"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                          >
+                            <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z" />
+                          </svg>
+                          Twitch
+                        </a>
+                      )}
 
-                    {match.streams.youtube && (
-                      <a
-                        href={match.streams.youtube}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="bg-red-700 hover:bg-red-600 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors duration-300"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          class="h-4 w-4 inline mr-1"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
+                      {match.streams.youtube && (
+                        <a
+                          href={match.streams.youtube}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="bg-red-700 hover:bg-red-600 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors duration-300"
                         >
-                          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                        </svg>
-                        YouTube
-                      </a>
-                    )}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 inline mr-1"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                          >
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                          </svg>
+                          YouTube
+                        </a>
+                      )}
+                    </div>
+
+                    <a
+                      href={generateGoogleCalendarUrl(match)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors duration-300"
+                    >
+                      📅 Add to Google Calendar
+                    </a>
+
+                    <a
+                      href={`data:text/calendar;charset=utf-8,${encodeURIComponent(generateICS(match))}`}
+                      download={`g2_vs_${match.team2}.ics`}
+                      class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors duration-300"
+                    >
+                      📥 Download .ics
+                    </a>
                   </div>
 
                   {match.status === "LIVE" && (
