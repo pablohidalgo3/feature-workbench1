@@ -1,11 +1,13 @@
 ---
+// IMPORTS
 import Layout from "../layouts/Layout.astro";
 import { CALENDAR_API_ENDPOINT } from "astro:env/server";
 
+// PETICIÓN A API
 const res = await fetch(CALENDAR_API_ENDPOINT);
 const matches = await res.json();
 
-// toDataURL como lo tenías…
+// CONVERTIR LOGO A BASE64
 async function toDataURL(url: RequestInfo | URL) {
   if (!url) return null;
   const imageRes = await fetch(url);
@@ -16,23 +18,32 @@ async function toDataURL(url: RequestInfo | URL) {
   return `data:${contentType};base64,${base64}`;
 }
 
+// CARGAR LOGOS CON COMPROBACIÓN DE NULL
 const matchesWithData = await Promise.all(
-  matches.map(async (match: { id: string; team1Logo: any; team2Logo: any }) => ({
+  matches.map(async (match: { team1Logo: string; team2Logo: string; tournament: any }) => ({
     ...match,
-    team1Logo: await toDataURL(match.team1Logo.replace(/\d+px/, "100px")),
-    team2Logo: await toDataURL(match.team2Logo.replace(/\d+px/, "100px")),
+    team1Logo: match.team1Logo
+      ? await toDataURL(match.team1Logo.replace(/\d+px/, "100px"))
+      : null,
+    team2Logo: match.team2Logo
+      ? await toDataURL(match.team2Logo.replace(/\d+px/, "100px"))
+      : null,
+      tournament: {
+      ...match.tournament,
+      logo: match.tournament?.logo
+        ? await toDataURL(match.tournament.logo)
+        : null,
+    },
   }))
 );
 
-// 1) Formatter para la parte de fecha (May 4, 2025)
+// FORMATOS DE FECHA
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "Europe/Madrid",
   month: "long",
   day: "numeric",
   year: "numeric",
 });
-
-// 2) Formatter para hora + abreviatura de zona (19:00 CEST / CET)
 const timeFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "Europe/Madrid",
   hour: "2-digit",
@@ -41,7 +52,7 @@ const timeFormatter = new Intl.DateTimeFormat("en-US", {
   timeZoneName: "short",
 });
 
-// 3) Reconversión final
+// TRANSFORMACIÓN Y FILTRADO
 const now = new Date();
 const localizedMatches = matchesWithData
   .map((match) => {
@@ -51,34 +62,28 @@ const localizedMatches = matchesWithData
     const d = new Date(raw);
     if (isNaN(d.getTime())) return null;
 
-    // Obtener partes de la fecha para comparación de días
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const matchDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
-    // Si el partido es de un día anterior al actual, no se muestra
     if (matchDay < today) return null;
 
     const datePart = dateFormatter.format(d);
     let timePart = timeFormatter.format(d);
     timePart = timePart.replace("GMT+2", "CEST").replace("GMT+1", "CET");
 
-    // Determinar estado del partido
     const diffMinutes = (now.getTime() - d.getTime()) / 60000;
     let status = null;
-    if (diffMinutes >= 0 && diffMinutes <= 50) {
-      status = "LIVE";
-    } else if (diffMinutes > 50) {
-      status = "FINALIZED";
-    }
+    if (diffMinutes >= 0 && diffMinutes <= 50) status = "LIVE";
+    else if (diffMinutes > 50) status = "FINALIZED";
 
     return {
       ...match,
       date: `${datePart} - ${timePart}`,
-      dateISO: d.toISOString(), // guarda la fecha en formato ISO válido
+      dateISO: d.toISOString(),
       status,
     };
   })
-  .filter(Boolean); // elimina partidos que sean null (anteriores al día actual)
+  .filter(Boolean);
 ---
 
 <Layout
@@ -95,32 +100,23 @@ const localizedMatches = matchesWithData
       style="grid-template-columns: repeat(auto-fit, minmax(320px, 800px)); margin-inline: auto;"
     >
       {
-        localizedMatches.map(
-          (
-            match: {
-              id: string;
-              tournament: {
-                name: string;
-                url: string | URL | null | undefined;
-              };
-              bo: string;
-              team1Logo: any;
-              team1: string;
-              team2Logo: any;
-              team2: string;
-              date: string;
-              dateISO: string;
-              status?: "LIVE" | "FINALIZED" | null;
-              streams: {
-                twitch?: string | URL | null;
-                youtube?: string | URL | null;
-              };
-            }
-          ) => (
+        localizedMatches.map((match) => {
+          const team2Name = match.team2 || "TBD";
+          const showCalendar = match.team2 !== null;
+
+          return (
             <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
               <div class="p-6">
                 <div class="flex justify-between items-center mb-4">
-                  <div class="text-sm font-semibold text-gray-400">
+                  <div class="text-sm font-semibold text-gray-400 flex items-center gap-2">
+                    {match.tournament.logo && (
+                      <img
+                        src={match.tournament.logo}
+                        alt={`${match.tournament.name} logo`}
+                        class="w-5 h-auto"
+                        loading="lazy"
+                      />
+                    )}
                     {match.tournament.name}
                   </div>
                   <div class="text-xs bg-gray-700 rounded-full px-3 py-1">
@@ -131,7 +127,7 @@ const localizedMatches = matchesWithData
                 <div class="flex justify-between items-center mb-6">
                   <div class="flex flex-col items-center w-2/5">
                     <img
-                      src={match.team1Logo || "/placeholder.svg"}
+                      src={match.team1Logo}
                       alt={String(match.team1)}
                       class="size-16 object-contain mb-2"
                     />
@@ -144,11 +140,14 @@ const localizedMatches = matchesWithData
 
                   <div class="flex flex-col items-center w-2/5">
                     <img
-                      src={match.team2Logo || "/placeholder.svg"}
-                      alt={String(match.team2)}
+                      src={
+                        match.team2Logo ||
+                        "https://tvmatcheslive.com/league-of-legends/international/lol-champions-korea-summer/damwon-gaming.png"
+                      }
+                      alt={String(team2Name)}
                       class="size-16 object-contain mb-2"
                     />
-                    <span class="font-bold text-xl">{match.team2}</span>
+                    <span class="font-bold text-xl">{team2Name}</span>
                   </div>
                 </div>
 
@@ -212,12 +211,14 @@ const localizedMatches = matchesWithData
                       )}
                     </div>
 
-                    <a
-                      href={`https://g2historyapi-production.up.railway.app/calendar/${match.id}`}
-                      class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold py-2 px-4 rounded-full transition-colors duration-300"
-                    >
-                      📅 Add to calendar
-                    </a>
+                    {showCalendar && (
+                      <a
+                        href={`https://g2historyapi-production.up.railway.app/calendar/${match.id}`}
+                        class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold py-2 px-4 rounded-full transition-colors duration-300"
+                      >
+                        📅 Add to calendar
+                      </a>
+                    )}
                   </div>
 
                   {match.status === "LIVE" && (
@@ -246,8 +247,8 @@ const localizedMatches = matchesWithData
                 </div>
               </div>
             </div>
-          )
-        )
+          );
+        })
       }
     </div>
 
@@ -265,7 +266,6 @@ const localizedMatches = matchesWithData
 </Layout>
 
 <style>
-  /* Additional custom styles if needed */
   main {
     min-height: 70vh;
   }
