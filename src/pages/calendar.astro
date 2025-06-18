@@ -97,7 +97,7 @@ const localizedMatches = matchesWithData
   title="G2 History Calendar"
   description="Consulta el calendario de partidos de G2 Esports."
   image="/g2_logo.png"
-  url="https://www.g2leaguehistory.online/calendar"
+  url="https://www.g2leaguehub.com/calendar"
 >
   <main class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-center mb-14">Upcoming matches</h1>
@@ -241,9 +241,9 @@ const localizedMatches = matchesWithData
                     </div>
                   )}
 
-                  {match.tournament.url && (
+                  {match.tournament_url && (
                     <a
-                      href={match.tournament.url}
+                      href={match.tournament_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       class="block mt-3 text-xs text-gray-400 hover:text-white transition-colors duration-300"
