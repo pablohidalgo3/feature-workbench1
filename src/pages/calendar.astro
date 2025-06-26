@@ -112,37 +112,49 @@ const localizedMatches = matchesWithData
           const showCalendar = match.team2 !== null;
 
           return (
-            <div class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div class="bg-gradient-to-bl from-gray-700 to-gray-950 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
               <div class="p-6">
-                <div class="flex justify-between items-center mb-4">
-                  <div class="text-sm font-semibold text-gray-400 flex items-center gap-2">
+                <div class="flex justify-between items-center mb-8">
+                  <div
+                    class={`flex items-center gap-3 shadow-md shadow-black rounded-3xl p-2 bg-gradient-to-tr ${
+                      match.tournament_name.includes("LEC")
+                        ? "from-teal-600"
+                        : match.tournament_name.includes("MSI")
+                          ? "from-yellow-200"
+                          : match.tournament_name.includes("Worlds")
+                            ? "from-amber-50"
+                            : "from-gray-100"
+                    }`}
+                  >
                     {match.tournament.logo && (
                       <img
                         src={match.tournament.logo}
                         alt={`${match.tournament_name} logo`}
-                        class="w-5 h-auto"
-                        loading="lazy"
+                        class="w-7 h-7 rounded-full"
                       />
                     )}
-                    {match.tournament_name}
+                    <span class="font-bold text-lg">
+                      {match.tournament_name}
+                    </span>
                   </div>
-                  <div class="text-xs bg-gray-700 rounded-full px-3 py-1">
+                  <div class="text-md bg-gray-700 rounded-full px-3 py-1 shadow-md shadow-black">
                     {match.bo.toUpperCase()}
                   </div>
                 </div>
 
                 <div class="flex justify-between items-center mb-6">
-                  <div class="flex flex-col items-center w-2/5">
+                  <div class="flex flex-col items-center w-2/5 ">
                     <img
                       src={match.team1Logo}
                       alt={String(match.team1)}
-                      class="size-16 object-contain mb-2"
+                      class="size-16 object-contain mb-2 drop-shadow-[0_6px_4px_rgba(0,0,0,0.6)]"
                     />
+
                     <span class="font-bold text-xl">{match.team1}</span>
                   </div>
 
-                  <div class="text-center">
-                    <span class="text-xl font-bold text-gray-400">VS</span>
+                  <div class="text-center px-8">
+                    <div class="text-3xl font-black text-gray-400 mb-2">VS</div>
                   </div>
 
                   <div class="flex flex-col items-center w-2/5">
@@ -152,7 +164,7 @@ const localizedMatches = matchesWithData
                         "https://tvmatcheslive.com/league-of-legends/international/lol-champions-korea-summer/damwon-gaming.png"
                       }
                       alt={String(team2Name)}
-                      class="size-16 object-contain mb-2"
+                      class="size-16 object-contain mb-2 drop-shadow-[0_6px_4px_rgba(0,0,0,0.6)]"
                     />
                     <span class="font-bold text-xl">{team2Name}</span>
                   </div>
@@ -184,7 +196,7 @@ const localizedMatches = matchesWithData
                           href={match.streams_twitch}
                           target="_blank"
                           rel="noopener noreferrer"
-                          class="bg-purple-700 hover:bg-purple-600 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors duration-300"
+                          class="bg-purple-700 hover:bg-purple-600 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors duration-300 shadow-md shadow-black"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -203,7 +215,7 @@ const localizedMatches = matchesWithData
                           href={match.streams_youtube}
                           target="_blank"
                           rel="noopener noreferrer"
-                          class="bg-red-700 hover:bg-red-600 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors duration-300"
+                          class="bg-red-700 hover:bg-red-600 text-white text-xs font-semibold py-1 px-3 rounded-full transition-colors duration-300 shadow-md shadow-black"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -221,7 +233,7 @@ const localizedMatches = matchesWithData
                     {showCalendar && (
                       <a
                         href={`https://g2historyapi.fly.dev/calendar/${match.id}`}
-                        class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold py-2 px-4 rounded-full transition-colors duration-300"
+                        class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold py-2 px-4 rounded-full transition-colors duration-300 shadow-md shadow-black"
                       >
                         📅 Add to calendar
                       </a>
