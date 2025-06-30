@@ -1,14 +1,22 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { SINGLE_PLAYER_API_ENDPOINT } from "astro:env/server";
+import { SINGLE_PLAYER_API_ENDPOINT, API_KEY } from "astro:env/server";
 import BirthdayWithAge from '../../components/BirthdayWithAge.astro';
 
 const { id } = Astro.params;
-const response = await fetch(`${SINGLE_PLAYER_API_ENDPOINT}/${id}`);
+const response = await fetch(`${SINGLE_PLAYER_API_ENDPOINT}/${id}`, {
+  headers: {
+    "Authorization": `Bearer ${API_KEY}`
+  }
+});
 const player = await response.json();
 
 export async function getStaticPaths() {
-  const response = await fetch(`${SINGLE_PLAYER_API_ENDPOINT}`);
+  const response = await fetch(`${SINGLE_PLAYER_API_ENDPOINT}`, {
+    headers: {
+      "Authorization": `Bearer ${API_KEY}`
+    }
+  });
   const players = await response.json();
   return players.map((player: { id: any }) => ({
     params: { id: player.id },

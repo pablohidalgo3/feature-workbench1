@@ -1,10 +1,14 @@
 ---
 // IMPORTS
 import Layout from "../layouts/Layout.astro";
-import { CALENDAR_API_ENDPOINT } from "astro:env/server";
+import { CALENDAR_API_ENDPOINT, API_KEY } from "astro:env/server";
 
 // PETICIÓN A API
-const res = await fetch(CALENDAR_API_ENDPOINT);
+const res = await fetch(CALENDAR_API_ENDPOINT, {
+  headers: {
+    "Authorization": `Bearer ${API_KEY}`
+  }
+});
 const matches = await res.json();
 
 // CONVERTIR LOGO A BASE64

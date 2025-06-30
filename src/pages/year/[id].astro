@@ -1,7 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { YEAR_PLAYERS_API_ENDPOINT } from "astro:env/server";
-import { YEARS_API_ENDPOINT } from "astro:env/server";
+import { YEAR_PLAYERS_API_ENDPOINT, YEARS_API_ENDPOINT, API_KEY } from "astro:env/server";
 
 // Definir el orden de las posiciones
 const positionOrder: Record<string, number> = {
@@ -20,8 +19,16 @@ let players = [];
 let years: any[] = [];
 
 const [playersResponse, yearsResponse] = await Promise.all([
-  fetch(`${YEAR_PLAYERS_API_ENDPOINT}/${selectedYear}`),
-  fetch(YEARS_API_ENDPOINT),
+  fetch(`${YEAR_PLAYERS_API_ENDPOINT}/${selectedYear}`, {
+    headers: {
+      "Authorization": `Bearer ${API_KEY}`
+    }
+  }),
+  fetch(YEARS_API_ENDPOINT, {
+    headers: {
+      "Authorization": `Bearer ${API_KEY}`
+    }
+  }),
 ]);
 
 players = await playersResponse.json();
