@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import { RANKING_API_ENDPOINT, YEAR_PLAYERS_API_ENDPOINT, API_KEY } from "astro:env/server";
+import { API_URL, API_KEY } from "astro:env/server";
 
 // Calcular el año actual
 const currentYear = new Date().getFullYear();
@@ -8,7 +8,7 @@ const currentYear = new Date().getFullYear();
 let players = [];
 
 // Llamada a la API para obtener los jugadores actuales
-const response = await fetch(`${YEAR_PLAYERS_API_ENDPOINT}/${currentYear}`, {
+const response = await fetch(`${API_URL}/players/year/${currentYear}`, {
   headers: {
     "Authorization": `Bearer ${API_KEY}`
   }
@@ -16,7 +16,7 @@ const response = await fetch(`${YEAR_PLAYERS_API_ENDPOINT}/${currentYear}`, {
 const currentPlayers = await response.json();
 
 // Llamada a la API para obtener el ranking
-const response2 = await fetch(RANKING_API_ENDPOINT, {
+const response2 = await fetch(`${API_URL}/ranking`, {
   headers: {
     "Authorization": `Bearer ${API_KEY}`
   }

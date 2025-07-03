@@ -1,10 +1,10 @@
 ---
 // IMPORTS
 import Layout from "../layouts/Layout.astro";
-import { CALENDAR_API_ENDPOINT, API_KEY } from "astro:env/server";
+import { API_URL, API_KEY } from "astro:env/server";
 
 // PETICIÓN A API
-const res = await fetch(CALENDAR_API_ENDPOINT, {
+const res = await fetch(`${API_URL}/matches/upcoming`, {
   headers: {
     "Authorization": `Bearer ${API_KEY}`
   }
@@ -236,7 +236,7 @@ const localizedMatches = matchesWithData
 
                     {showCalendar && (
                       <a
-                        href={`https://g2historyapi.fly.dev/calendar/${match.id}`}
+                        href={`${API_URL}/calendar/${match.id}`}
                         class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold py-2 px-4 rounded-full transition-colors duration-300 shadow-md shadow-black"
                       >
                         📅 Add to calendar

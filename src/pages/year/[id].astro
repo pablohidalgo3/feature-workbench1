@@ -1,6 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { YEAR_PLAYERS_API_ENDPOINT, YEARS_API_ENDPOINT, API_KEY } from "astro:env/server";
+import { API_URL, API_KEY } from "astro:env/server";
 
 // Definir el orden de las posiciones
 const positionOrder: Record<string, number> = {
@@ -19,12 +19,12 @@ let players = [];
 let years: any[] = [];
 
 const [playersResponse, yearsResponse] = await Promise.all([
-  fetch(`${YEAR_PLAYERS_API_ENDPOINT}/${selectedYear}`, {
+  fetch(`${API_URL}/players/year/${selectedYear}`, {
     headers: {
       "Authorization": `Bearer ${API_KEY}`
     }
   }),
-  fetch(YEARS_API_ENDPOINT, {
+  fetch(`${API_URL}/years`, {
     headers: {
       "Authorization": `Bearer ${API_KEY}`
     }
@@ -50,7 +50,11 @@ function getYearLabel(year: never) {
 }
 // Exportar las rutas dinámicas basadas en los años disponibles
 export async function getStaticPaths() {
-  const response = await fetch(YEARS_API_ENDPOINT);
+  const response = await fetch(`${API_URL}/players/year`, {
+    headers: {
+      "Authorization": `Bearer ${API_KEY}`
+    }
+  });
 
   const yearsData = await response.json();
 
