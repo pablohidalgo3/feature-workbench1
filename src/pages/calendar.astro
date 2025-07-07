@@ -103,8 +103,8 @@ const localizedMatches = matchesWithData
   image="/g2_logo.png"
   url="https://www.g2leaguehub.com/calendar"
 >
-  <main class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-center mb-14">Upcoming matches</h1>
+  <main class="flex flex-col items-center">
+    <h1 class="text-3xl font-bold text-center mb-10">Upcoming matches</h1>
 
     <div
       class="grid gap-6 place-content-center"
@@ -276,7 +276,7 @@ const localizedMatches = matchesWithData
     </div>
 
     {
-      matches.length === 0 && (
+      localizedMatches.length === 0 && (
         <div class="text-center py-10">
           <p class="text-xl text-gray-400">
             No upcoming matches scheduled at the moment.

@@ -1,0 +1,147 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+const timeline = [
+  {
+    year: "2016",
+    title: "Debut and Domination in Europe",
+    description:
+      "G2 debuted in the EU LCS, winning both Spring and Summer Splits. However, at both MSI and Worlds, the team failed to make it past the group stage.",
+    image: "/2016.jpg",
+  },
+  {
+    year: "2017",
+    title: "Kings of Europe",
+    description:
+      "Champions once again in Spring and Summer, establishing themselves as the dominant European force. It was their first big international year, finishing as runner-up to SKT T1 at MSI and reaching quarterfinals at Worlds.",
+    image: "/2017.jpg",
+  },
+  {
+    year: "2018",
+    title: "Dangerous Underdogs",
+    description:
+      "A renewed roster struggled domestically, but managed a historic run at Worlds, eliminating RNG in a legendary series. Unfortunately, they fell to Invictus Gaming, who would go on to be world champions.",
+    image: "/2018.jpg",
+  },
+  {
+    year: "2019",
+    title: "The Golden Year",
+    description:
+      "LEC champions in both Spring and Summer with unprecedented dominance, which translated internationally by winning MSI, becoming the first and only European team to do so. After this milestone, G2 entered Worlds as clear favorites, defeating SKT T1 in one of the best series ever and reaching the final. However, the dream ended with a 0-3 loss to FunPlus Phoenix.",
+    image: "/2019.avif",
+  },
+  {
+    year: "2020",
+    title: "Perkz's Last Year",
+    description:
+      "G2 won both LEC splits again in a year marked by the pandemic and remote competition. There was no MSI this year, but the team made a strong run at Worlds, reaching the semifinals where they fell to eventual champions DAMWON. The club legend and icon Perkz said goodbye and signed with Cloud9.",
+    image: "/2020.avif",
+  },
+  {
+    year: "2021",
+    title: "End of the Golden Era",
+    description:
+      "After the promising signing of Rekkles, G2 failed to win a domestic title all year, culminating in a huge disappointment as they missed out on Worlds for the first time in their history.",
+    image: "/2021.avif",
+  },
+  {
+    year: "2022",
+    title: "Renewal and New Titles",
+    description:
+      "After the previous year's disappointment, big changes arrived. G2 won the Spring Split and qualified for MSI, where they lost in the semifinals to T1. They also qualified for Worlds but were eliminated in the group stage with a forgettable result.",
+    image: "2022.jpg",
+  },
+  {
+    year: "2023",
+    title: "Back to National Dominance",
+    description:
+      "After an up-and-down 2022, G2 won the LEC in Winter and Summer, though their MSI run was forgettable. They became the first ever LEC Grand Finals champions. At Worlds, the team started strong but couldn't turn that into results, being eliminated in the Swiss Stage.",
+    image: "/2023.jpg",
+  },
+  {
+    year: "2024",
+    title: "Absolute Dominance in EMEA",
+    description:
+      "G2 dominated the LEC from the start, winning every split and the LEC Grand Finals. After a great showing at MSI, going toe-to-toe with the world's best, G2 entered Worlds with some doubts about their performance, which were confirmed after falling again in the Swiss Stage.",
+    image: "/2024.jpg",
+  },
+];
+
+
+---
+
+<Layout
+  title="G2 History About"
+  description="Consulta la sección About de la web."
+  image="/g2_logo.png"
+  url="https://www.g2leaguehub.com/about"
+>
+  <main class="flex flex-col items-center">
+    <h1 class="text-3xl font-bold text-center mb-14">
+      League of Legends G2 Timeline
+    </h1>
+
+    <div class="relative">
+      <div
+        class="absolute left-1/2 top-0 w-1 h-full bg-gray-700 -translate-x-1/2 z-0"
+      >
+      </div>
+
+      {
+        timeline.map((event, index) => (
+          <div class="grid grid-cols-1 md:grid-cols-9 items-center mb-20 relative">
+            {index % 2 === 0 ? (
+              <>
+                {/* Imagen IZQUIERDA */}
+                <div class="md:col-span-4 md:col-start-1 flex justify-end px-8 z-10">
+                  <img
+                    src={event.image}
+                    alt={`Imagen ${event.year}`}
+                    class="rounded-2xl shadow-lg border max-w-lg"
+                  />
+                </div>
+                {/* Punto central */}
+                <div class="md:col-span-1 flex justify-center items-center relative">
+                  <div class="w-5 h-5 bg-red-500 border-4 border-black rounded-full z-10" />
+                </div>
+                {/* Texto DERECHA */}
+                <div class="md:col-span-4 flex justify-start px-8 z-10">
+                  <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 max-w-xl w-full">
+                    <h2 class="text-xl font-bold text-red-400 mb-2">
+                      {event.year} · {event.title}
+                    </h2>
+                    <p class="text-gray-300">{event.description}</p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Texto IZQUIERDA */}
+                <div class="md:col-span-4 flex justify-end px-8 z-10">
+                  <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 max-w-xl w-full">
+                    <h2 class="text-xl font-bold text-red-400 mb-2">
+                      {event.year} · {event.title}
+                    </h2>
+                    <p class="text-gray-300">{event.description}</p>
+                  </div>
+                </div>
+                {/* Punto central */}
+                <div class="md:col-span-1 flex justify-center items-center relative">
+                  <div class="w-5 h-5 bg-red-500 border-4 border-black rounded-full z-10" />
+                </div>
+                {/* Imagen DERECHA */}
+                <div class="md:col-span-4 flex justify-start px-8 z-10">
+                  <img
+                    src={event.image}
+                    alt={`Imagen ${event.year}`}
+                    class="rounded-2xl shadow-lg border max-w-lg"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+        ))
+      }
+    </div>
+  </main>
+</Layout>
