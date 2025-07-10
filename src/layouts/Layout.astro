@@ -22,19 +22,19 @@ const { title, description, image, url } = Astro.props;
 		<title>{title}</title>
 	  
 		<!-- SEO Meta Tags -->
-		<meta name="description" content={description || "Consulta el historial de G2 Esports y sus rankings."} />
+		<meta name="description" content={description || "Toda la información que necesitas sobre G2 Esports en League of Legends."} />
 	  
 		<!-- Open Graph (para redes sociales) -->
 		<meta property="og:title" content={title} />
-		<meta property="og:description" content={description || "Consulta el historial de G2 Esports y sus rankings."} />
+		<meta property="og:description" content={description || "Toda la información que necesitas sobre G2 Esports en League of Legends."} />
 		<meta property="og:image" content={image || "/g2_logo.png"} />
-		<meta property="og:url" content={url || "https://www.g2leaguehistory.online/"} />
+		<meta property="og:url" content={url || "https://www.g2leaguehub.com/"} />
 		<meta property="og:type" content="website" />
 	  
 		<!-- Twitter Card -->
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={title} />
-		<meta name="twitter:description" content={description || "Consulta el historial de G2 Esports y sus rankings."} />
+		<meta name="twitter:description" content={description || "Toda la información que necesitas sobre G2 Esports en League of Legends."} />
 		<meta name="twitter:image" content={image || "/g2_logo.png"} />
 	  
 		<ClientRouter />
