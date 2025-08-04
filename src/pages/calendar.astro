@@ -6,8 +6,8 @@ import { API_URL, API_KEY } from "astro:env/server";
 // PETICIÓN A API
 const res = await fetch(`${API_URL}/matches/upcoming`, {
   headers: {
-    "Authorization": `Bearer ${API_KEY}`
-  }
+    Authorization: `Bearer ${API_KEY}`,
+  },
 });
 const matches = await res.json();
 
@@ -107,9 +107,9 @@ const localizedMatches = matchesWithData
     <h1 class="text-3xl font-bold text-center mb-10">Upcoming matches</h1>
 
     <div
-      class="grid gap-6 place-content-center"
-      style="grid-template-columns: repeat(auto-fit, minmax(320px, 800px)); margin-inline: auto;"
-    >
+   class="grid gap-6 place-content-center px-3 sm:px-0"
+   style="grid-template-columns: repeat(auto-fit, minmax(320px, 800px)); margin-inline: auto;"
+ >
       {
         localizedMatches.map((match) => {
           const team2Name = match.team2 || "TBD";
@@ -131,11 +131,13 @@ const localizedMatches = matchesWithData
                     }`}
                   >
                     {match.tournament.logo && (
-                      <img
-                        src={match.tournament.logo}
-                        alt={`${match.tournament_name} logo`}
-                        class="w-7 h-7 rounded-full"
-                      />
+                      <div class="w-8 h-8">
+                        <img
+                          src={match.tournament.logo}
+                          alt={`${match.tournament_name} logo`}
+                          class="w-full h-full object-contain"
+                        />
+                      </div>
                     )}
                     <span class="font-bold text-lg">
                       {match.tournament_name}
