@@ -21,13 +21,13 @@ let years: any[] = [];
 const [playersResponse, yearsResponse] = await Promise.all([
   fetch(`${API_URL}/players/year/${selectedYear}`, {
     headers: {
-      "Authorization": `Bearer ${API_KEY}`
-    }
+      Authorization: `Bearer ${API_KEY}`,
+    },
   }),
   fetch(`${API_URL}/years`, {
     headers: {
-      "Authorization": `Bearer ${API_KEY}`
-    }
+      Authorization: `Bearer ${API_KEY}`,
+    },
   }),
 ]);
 
@@ -52,8 +52,8 @@ function getYearLabel(year: never) {
 export async function getStaticPaths() {
   const response = await fetch(`${API_URL}/players/year`, {
     headers: {
-      "Authorization": `Bearer ${API_KEY}`
-    }
+      Authorization: `Bearer ${API_KEY}`,
+    },
   });
 
   const yearsData = await response.json();
@@ -64,8 +64,8 @@ export async function getStaticPaths() {
 }
 ---
 
-<Layout 
-  title="G2 League Playerbase" 
+<Layout
+  title="G2 League Playerbase"
   description="Consulta la base de jugadores de G2 Esports en League of Legends por año."
   image="/g2_logo.png"
   url=`https://www.g2leaguehub.com/year/${selectedYear}`
@@ -123,6 +123,8 @@ export async function getStaticPaths() {
                       <img
                         transition:name={`img-${nickname}`}
                         class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
+                        loading="lazy"
+                        decoding="async"
                         src={img}
                         alt={name}
                       />
@@ -178,6 +180,8 @@ export async function getStaticPaths() {
                         <img
                           transition:name={`img-${nickname}`}
                           class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
+                          loading="lazy"
+                          decoding="async"
                           src={img}
                           alt={name}
                         />
@@ -230,6 +234,8 @@ export async function getStaticPaths() {
                         <img
                           transition:name={`img-${nickname}`}
                           class="mr-5 w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-full mb-2 object-cover object-top"
+                          loading="lazy"
+                          decoding="async"
                           src={img}
                           alt={name}
                         />
@@ -262,32 +268,46 @@ export async function getStaticPaths() {
         <div class="timeline overflow-x-auto mt-10 px-4 md:px-8">
           <div class="relative">
             <!-- Línea continua detrás de todos los puntos -->
-            <div class="absolute top-[11px] left-0 right-0 h-0.5 bg-gray-300"></div>
-            
+            <div class="absolute top-[11px] left-0 right-0 h-0.5 bg-gray-300">
+            </div>
+
             <!-- Elemento animado -->
-            <div id="animatedLine" class="absolute top-[11px] h-0.5 bg-yellow-500 transition-all duration-300 ease-in-out"></div>
-            
-            <ol id="timelineList" class="flex justify-between w-full relative m-0 p-0">
-              {years.map((year) => (
-                <li class="relative text-center flex-grow flex-basis-0 px-2">
-                  <a
-                    href={`/year/${year.year_identifier}`}
-                    class={`block transition-all duration-300 ${
-                      year.year_identifier === selectedYear ? "text-yellow-500 font-bold" : "text-gray-500"
-                    }`}
-                    data-year={year.year_identifier}
-                    aria-label={`Año ${year.label}`}
-                  >
-                    <div class="h-6 flex items-center justify-center relative">
-                      <div
-                        class={`absolute top-1/2 -translate-y-1/2 rounded-full transition-all duration-300 z-10
+            <div
+              id="animatedLine"
+              class="absolute top-[11px] h-0.5 bg-yellow-500 transition-all duration-300 ease-in-out"
+            >
+            </div>
+
+            <ol
+              id="timelineList"
+              class="flex justify-between w-full relative m-0 p-0"
+            >
+              {
+                years.map((year) => (
+                  <li class="relative text-center flex-grow flex-basis-0 px-2">
+                    <a
+                      href={`/year/${year.year_identifier}`}
+                      class={`block transition-all duration-300 ${
+                        year.year_identifier === selectedYear
+                          ? "text-yellow-500 font-bold"
+                          : "text-gray-500"
+                      }`}
+                      data-year={year.year_identifier}
+                      aria-label={`Año ${year.label}`}
+                    >
+                      <div class="h-6 flex items-center justify-center relative">
+                        <div
+                          class={`absolute top-1/2 -translate-y-1/2 rounded-full transition-all duration-300 z-10
                         ${year.year_identifier === selectedYear ? "bg-yellow-500 w-6 h-6" : "bg-gray-300 w-4 h-4"}`}
-                      ></div>
-                    </div>
-                    <span class="text-sm transition-all duration-300 block mt-2">{year.label}</span>
-                  </a>
-                </li>
-              ))}
+                        />
+                      </div>
+                      <span class="text-sm transition-all duration-300 block mt-2">
+                        {year.label}
+                      </span>
+                    </a>
+                  </li>
+                ))
+              }
             </ol>
           </div>
         </div>

@@ -1,21 +1,21 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import { API_URL, API_KEY } from "astro:env/server";
-import BirthdayWithAge from '../../components/BirthdayWithAge.astro';
+import BirthdayWithAge from "../../components/BirthdayWithAge.astro";
 
 const { id } = Astro.params;
 const response = await fetch(`${API_URL}/players/${id}`, {
   headers: {
-    "Authorization": `Bearer ${API_KEY}`
-  }
+    Authorization: `Bearer ${API_KEY}`,
+  },
 });
 const player = await response.json();
 
 export async function getStaticPaths() {
   const response = await fetch(`${API_URL}/players`, {
     headers: {
-      "Authorization": `Bearer ${API_KEY}`
-    }
+      Authorization: `Bearer ${API_KEY}`,
+    },
   });
   const players = await response.json();
   return players.map((player: { id: any }) => ({
@@ -24,16 +24,8 @@ export async function getStaticPaths() {
   }));
 }
 
-const {
-  nickname,
-  name,
-  country,
-  birthday,
-  position,
-  img,
-  trivia,
-  titles,
-} = player;
+const { nickname, name, country, birthday, position, img, trivia, titles } =
+  player;
 
 const formattedTitles = titles
   ? titles.split(";").map((title: string) => title.trim())
@@ -49,8 +41,9 @@ const titleMap = {
   MSI: "🌟", // Muy especial
 };
 ---
-<Layout 
-title={`${nickname} - Player Profile`}
+
+<Layout
+  title={`${nickname} - Player Profile`}
   description="Consulta el perfil de cada jugador de G2 Esports en League of Legends."
   image="/g2_logo.png"
   url=`https://www.g2leaguehub.com/player/${id}`
@@ -68,6 +61,8 @@ title={`${nickname} - Player Profile`}
             <img
               transition:name={`img-${nickname}`}
               class="w-full h-full object-contain mask-gradient"
+              loading="lazy"
+              decoding="async"
               src={img || "/placeholder.svg"}
               alt={name}
             />
@@ -227,14 +222,12 @@ title={`${nickname} - Player Profile`}
                 {formattedTitles.map((title: string) => (
                   <li class="flex items-center gap-3 justify-center lg:justify-start">
                     <span class="text-primary text-xl lg:text-2xl leading-none">
-                      {
-                        titleMap[
-                          Object.keys(titleMap).find(
-                            (key): key is keyof typeof titleMap =>
-                              title.includes(key)
-                          ) as keyof typeof titleMap
-                        ] || "🏆"
-                      }
+                      {titleMap[
+                        Object.keys(titleMap).find(
+                          (key): key is keyof typeof titleMap =>
+                            title.includes(key)
+                        ) as keyof typeof titleMap
+                      ] || "🏆"}
                     </span>
                     <span class="text-base lg:text-lg text-muted-foreground leading-tight">
                       {title}

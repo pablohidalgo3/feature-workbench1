@@ -66,8 +66,6 @@ const timeline = [
     image: "/2024.jpg",
   },
 ];
-
-
 ---
 
 <Layout
@@ -82,8 +80,14 @@ const timeline = [
     </h1>
     <div class="relative w-full">
       <!-- Línea central -->
-      <div class="hidden md:block absolute left-1/2 top-0 w-1 h-full bg-gray-700 -translate-x-1/2 z-0"></div>
-      <div class="block md:hidden absolute left-1/2 top-0 w-0.5 h-full bg-gray-700 -translate-x-1/2 z-0"></div>
+      <div
+        class="hidden md:block absolute left-1/2 top-0 w-1 h-full bg-gray-700 -translate-x-1/2 z-0"
+      >
+      </div>
+      <div
+        class="block md:hidden absolute left-1/2 top-0 w-0.5 h-full bg-gray-700 -translate-x-1/2 z-0"
+      >
+      </div>
 
       {
         timeline.map((event, index) => (
@@ -98,6 +102,8 @@ const timeline = [
               <img
                 src={event.image}
                 alt={`Image ${event.year}`}
+                loading="lazy"
+                decoding="async"
                 class="rounded-2xl shadow-lg border max-w-xs w-full mb-4"
               />
               <div class="w-5 h-5 bg-red-500 border-4 border-black rounded-full mb-4" />
@@ -117,6 +123,8 @@ const timeline = [
                   <img
                     src={event.image}
                     alt={`Image ${event.year}`}
+                    loading="lazy"
+                    decoding="async"
                     class="rounded-2xl shadow-lg border max-w-lg"
                   />
                 </div>
