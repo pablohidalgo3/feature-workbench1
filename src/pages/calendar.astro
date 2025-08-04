@@ -98,7 +98,7 @@ const localizedMatches = matchesWithData
 ---
 
 <Layout
-  title="G2 History Calendar"
+  title="G2 League Calendar"
   description="Consulta el calendario de partidos de G2 Esports en League of Legends."
   image="/g2_logo.png"
   url="https://www.g2leaguehub.com/calendar"
@@ -107,9 +107,9 @@ const localizedMatches = matchesWithData
     <h1 class="text-3xl font-bold text-center mb-10">Upcoming matches</h1>
 
     <div
-   class="grid gap-6 place-content-center px-3 sm:px-0"
-   style="grid-template-columns: repeat(auto-fit, minmax(320px, 800px)); margin-inline: auto;"
- >
+      class="grid gap-6 place-content-center px-3 sm:px-0"
+      style="grid-template-columns: repeat(auto-fit, minmax(320px, 800px)); margin-inline: auto;"
+    >
       {
         localizedMatches.map((match) => {
           const team2Name = match.team2 || "TBD";
