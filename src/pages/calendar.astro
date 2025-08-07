@@ -3,6 +3,8 @@
 import Layout from "../layouts/Layout.astro";
 import { API_URL, API_KEY } from "astro:env/server";
 
+const { showCalendar, match } = Astro.props;
+
 // PETICIÓN A API
 const res = await fetch(`${API_URL}/matches/upcoming`, {
   headers: {
@@ -95,7 +97,9 @@ const localizedMatches = matchesWithData
     };
   })
   .filter(Boolean)
-  .sort((a, b) => new Date(a.dateISO).getTime() - new Date(b.dateISO).getTime());
+  .sort(
+    (a, b) => new Date(a.dateISO).getTime() - new Date(b.dateISO).getTime()
+  );
 ---
 
 <Layout
@@ -245,7 +249,7 @@ const localizedMatches = matchesWithData
 
                     {showCalendar && (
                       <a
-                        href={`${API_URL}/calendar/${match.id}`}
+                        href={`/api/calendar/${match.id}`}
                         class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-semibold py-2 px-4 rounded-full transition-colors duration-300 shadow-md shadow-black"
                       >
                         📅 Add to calendar
