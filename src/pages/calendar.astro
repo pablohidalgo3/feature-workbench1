@@ -94,7 +94,8 @@ const localizedMatches = matchesWithData
       status,
     };
   })
-  .filter(Boolean);
+  .filter(Boolean)
+  .sort((a, b) => new Date(a.dateISO).getTime() - new Date(b.dateISO).getTime());
 ---
 
 <Layout
@@ -107,7 +108,7 @@ const localizedMatches = matchesWithData
     <h1 class="text-3xl font-bold text-center mb-10">Upcoming matches</h1>
 
     <div
-      class="grid gap-6 place-content-center px-3 sm:px-0"
+      class="grid gap-6 place-content-center px-3 sm:px-0 mb-16"
       style="grid-template-columns: repeat(auto-fit, minmax(320px, 800px)); margin-inline: auto;"
     >
       {
